@@ -49,7 +49,6 @@
   <div class="card">
     <h2>So funktioniert der Kill Switch</h2>
     <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Master-QR hochladen</strong><br>Lade deinen bei der Registrierung erhaltenen Master-QR hoch. Entschlüsselung läuft lokal im Browser.</div></div>
-    <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Zahlung</strong><br>Nach Zahlungseingang startet der Prozess automatisch.</div></div>
     <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Signierter Kill-Befehl übers Nostr-Netzwerk</strong><br>Dein Browser signiert ein Nostr-Event (NIP-01, Kind 30078) und verteilt es an alle öffentlichen Relays. Private Keys werden sofort nach Signatur aus dem RAM gelöscht.</div></div>
     <div class="step"><div class="step-num">4</div><div class="step-text"><strong>Handy empfängt und startet Wipe</strong><br>Sobald das Handy online geht, holt es den Befehl aus einem Nostr-Relay, prüft die Signatur gegen den Hardware-Keystore und startet die Löschung.</div></div>
     <div class="step"><div class="step-num">5</div><div class="step-text"><strong>Peer-GONE Benachrichtigung</strong><br>Vor dem Löschen sendet die App an alle Kontakte eine signierte "GONE"-Nachricht. Ihre Apps löschen daraufhin den Chat-Verlauf und deine Onion-Adresse.</div></div>
@@ -70,7 +69,7 @@
   <div id="killSection" class="card" style="display:none;border:2px solid var(--red)">
     <h2 style="color:var(--red);border:none">⚠️ Tresor identifiziert — Kill Switch bereit</h2>
     <p>App-ID: <strong id="displayAppId"></strong></p>
-    <p>Bestätige die Zahlung unten. Kill-Befehl wird <strong>unmittelbar nach Zahlungs-Eingang</strong> an die Nostr-Relays verteilt.</p>
+    <button class="btn btn-red" style="width:100%;margin-top:12px;border:none;cursor:pointer;font-family:inherit;padding:14px" onclick="triggerKillNow()">💥 KILL SWITCH JETZT AUSLÖSEN (kostenlos)</button>
   </div>
 
   <div class="card">
@@ -93,26 +92,14 @@
     <div class="info">
       Der Kill Switch wirkt nur, <strong>wenn dein Handy nochmal online geht</strong>. Ist das Handy komplett tot, nie wieder angeschaltet oder im Faraday-Käfig — läuft er nicht.<br><br>
       <strong>ABER:</strong> Deine Daten sind durch Hardware-Keystore + PIN + Argon2id + Kyber-1024 ohnehin unknackbar. Der Kill Switch ist die zusätzliche Sicherheit obendrauf, nicht die erste Verteidigungslinie.<br><br>
-      <strong>🎉 Launch-Angebot:</strong> Für die ersten 1.000 Kunden kostenlos!
+      
     </div>
   </div>
 
-  <div class="price-section">
-    <div style="font-family:monospace;font-size:13px;opacity:0.8;letter-spacing:2px">KILL-SWITCH-GEBÜHR</div>
-    <div class="price">99,00 €</div>
-    <div style="font-size:13px;opacity:0.8">Launch-Angebot: Ersten 1.000 Kunden kostenlos</div>
+  <</div>
   </div>
 
-  <div class="card">
-    <h2>Zahlungsmethode wählen</h2>
-    <div class="payment-grid">
-      <div class="payment" onclick="pay('paypal','99')"><div class="payment-icon">💳</div>PayPal<small>Käuferschutz</small></div>
-      <div class="payment" onclick="pay('klarna','99')"><div class="payment-icon">🅺</div>Klarna<small>Sofortüberweisung</small></div>
-      <div class="payment" onclick="pay('card','99')"><div class="payment-icon">💰</div>Kreditkarte<small>Visa/MasterCard</small></div>
-      <div class="payment" onclick="pay('sepa','99')"><div class="payment-icon">🏦</div>SEPA<small>EPC-QR-Code</small></div>
-      <div class="payment" onclick="pay('xmr','99')"><div class="payment-icon">🔒</div>Monero<small>100% anonym</small></div>
-      <div class="payment" onclick="pay('btc','99')"><div class="payment-icon">₿</div>Bitcoin<small>Lightning</small></div>
-    </div>
+  
   </div>
 
   <footer>
@@ -127,20 +114,10 @@
   </footer>
 </div>
 
-<div class="modal-overlay" id="paymentModal" onclick="if(event.target===this)closeModal()">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal()">×</button>
-    <h2 id="modalTitle">Zahlung</h2>
-    <div id="modalContent"></div>
-  </div>
-</div>
+
 
 <script>
-const WALLETS = {
-  btc: {addr:'bc1qexampleonyxvaultbtcaddress000000000000', amount:'0.0016', coin:'BTC', amountEUR:'99'},
-  xmr: {addr:'48ExampleOnyxVaultMoneroAddressGoesHere0000000000000000000000000000000000000000000000000000000000', amount:'0.66', coin:'XMR', amountEUR:'99'},
-  eth: {addr:'0xExampleOnyxVaultEthereumAddress0000000000', amount:'0.030', coin:'ETH', amountEUR:'99'}
-};
+
 
 document.addEventListener('DOMContentLoaded', () => {
   const zone = document.getElementById('dropZone');
@@ -194,63 +171,26 @@ function loadImage(file) {
   });
 }
 
-function closeModal() { document.getElementById('paymentModal').classList.remove('active'); }
 
-function copyAddr(id) {
-  const el = document.getElementById(id);
-  navigator.clipboard.writeText(el.textContent.trim()).then(() => {
-    const btn = document.getElementById(id + '_btn');
-    btn.textContent = '✓ KOPIERT!';
-    btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = '📋 Adresse kopieren'; btn.classList.remove('copied'); }, 2000);
-  });
-}
 
-function pay(method, amount) {
+async function triggerKillNow() {
   if (!Hermes.isReady()) {
     alert('Bitte zuerst Master-QR hochladen.');
     return;
   }
-  if (!confirm('⚠️ KILL SWITCH AUSLÖSEN?\n\nDiese Aktion ist UNUMKEHRBAR!\nAlle Daten werden forensisch vernichtet.\n\nFortfahren?')) return;
+  if (!confirm('⚠️ KILL SWITCH JETZT AUSLÖSEN?
 
-  const modal = document.getElementById('paymentModal');
-  const title = document.getElementById('modalTitle');
-  const content = document.getElementById('modalContent');
-  const names = {paypal:'PayPal', klarna:'Klarna', card:'Kreditkarte', sepa:'SEPA', xmr:'Monero', btc:'Bitcoin'};
-  title.textContent = names[method] + ' — ' + amount + '€';
+Diese Aktion ist UNUMKEHRBAR!
+Alle Daten werden forensisch vernichtet.
 
-  if (method === 'btc' || method === 'xmr' || method === 'eth') {
-    const w = WALLETS[method];
-    content.innerHTML =
-      '<div class="wallet-info">🎉 <strong>Launch-Angebot:</strong> Für die ersten 1.000 Kunden kostenlos!</div>'+
-      '<div class="wallet-section">'+
-        '<div class="wallet-coin">SENDE AN DIESE '+w.coin+'-ADRESSE</div>'+
-        '<div class="wallet-amount">'+w.amount+' '+w.coin+'</div>'+
-        '<div style="font-size:12px;opacity:0.7">≈ '+w.amountEUR+' €</div>'+
-        '<div class="wallet-qr">QR wird in Produktion generiert</div>'+
-        '<div class="wallet-addr" id="addr_'+method+'">'+w.addr+'</div>'+
-        '<button class="btn-copy" id="addr_'+method+'_btn" onclick="copyAddr(\'addr_'+method+'\')">📋 Adresse kopieren</button>'+
-      '</div>'+
-      '<button class="wallet-connect-btn" onclick="activateFreeMode()">🎉 Launch-Angebot nutzen (kostenlos)</button>'+
-      '<div style="text-align:center;margin-top:12px;font-size:12px;opacity:0.6">Zahlung wird automatisch erkannt sobald '+w.coin+'-TX bestätigt ist.</div>';
-  } else {
-    content.innerHTML =
-      '<div class="wallet-info">🎉 <strong>Launch-Angebot:</strong> Für die ersten 1.000 Kunden kostenlos!</div>'+
-      '<div class="wallet-section">'+
-        '<div class="wallet-coin">BEZAHLE MIT '+names[method].toUpperCase()+'</div>'+
-        '<div class="wallet-amount">'+amount+' €</div>'+
-        '<div style="font-size:13px;opacity:0.8;margin-top:16px">In Produktion öffnet sich hier dein '+names[method]+'-Zahlungsdialog.</div>'+
-      '</div>'+
-      '<button class="wallet-connect-btn" onclick="activateFreeMode()">🎉 Launch-Angebot nutzen (kostenlos)</button>';
-  }
-  modal.classList.add('active');
-}
-
-async function activateFreeMode() {
-  closeModal();
+Fortfahren?')) return;
   const res = await Hermes.sendKillCommand();
   if (res.ok) {
-    alert('💥 KILL-SIGNAL GESENDET an ' + res.relaysReached + '/' + res.relaysTotal + ' Nostr-Relays!\n\nEvent-ID: ' + res.eventId.substring(0,16) + '...\n\nDer Befehl wurde dezentral gestreut. Dein Tresor wird bei der nächsten Verbindung vernichtet.');
+    alert('💥 KILL-SIGNAL GESENDET an ' + res.relaysReached + '/' + res.relaysTotal + ' Nostr-Relays!
+
+Event-ID: ' + res.eventId.substring(0,16) + '...
+
+Dein Tresor wird bei der nächsten Verbindung vernichtet.');
   } else {
     alert('❌ Nostr-Versand fehlgeschlagen: ' + (res.error || 'unbekannt'));
   }

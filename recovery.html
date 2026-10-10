@@ -52,14 +52,14 @@
   <div id="actionSection" class="card" style="display:none;border:1px solid var(--teal)">
     <h2 style="color:var(--teal);border:none">✅ Tresor identifiziert</h2>
     <p>App-ID: <strong id="displayAppId"></strong></p>
-    <p>Status: Bereit für Recovery-Befehl. Wähle unten eine Zahlungsmethode (Launch-Angebot für die ersten 1.000 Kunden kostenlos).</p>
+    <p>Status: Bereit. Klicke den Button um Recovery an deine Nostr-Relays zu senden.</p>
+    <button class="btn" style="width:100%;margin-top:12px;background:var(--teal);color:var(--bg);border:none;cursor:pointer;font-family:inherit;padding:14px" onclick="sendRecoveryNow()">🔓 RECOVERY JETZT SENDEN (kostenlos)</button>
   </div>
 
   <div class="card">
     <h2>So funktioniert Recovery via QR</h2>
     <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Master-QR hochladen</strong><br>Deine Identität wird lokal im Browser entschlüsselt (AES-GCM mit App-ID als Key).</div></div>
     <div class="step"><div class="step-num">2</div><div class="step-text"><strong>App-ID extrahieren</strong><br>Nostr-Pubkey und App-ID werden aus dem QR-Code extrahiert. Private Keys bleiben nur im RAM.</div></div>
-    <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Zahlung durchführen</strong><br>Wähle eine Zahlungsmethode. Die Zahlung dient als Anti-Spam-Schutz und Infrastruktur-Kostendeckung.</div></div>
     <div class="step"><div class="step-num">4</div><div class="step-text"><strong>Signierter Recovery-Befehl übers Nostr-Netzwerk</strong><br>Nach Zahlungseingang wird ein kryptografisch signiertes Event (NIP-01, Kind 30081) an alle Nostr-Relays verteilt. Weder wir noch die Relays kennen deinen App-Inhalt.</div></div>
     <div class="step"><div class="step-num">5</div><div class="step-text"><strong>Handy empfängt und entsperrt (bis 24h)</strong><br>Sobald dein Handy online geht, holt die App den Befehl von einem Nostr-Relay, prüft die Signatur gegen deinen Hardware-Keystore und entsperrt sich. Alte Daten bleiben erhalten.</div></div>
   </div>
@@ -76,31 +76,12 @@
     </table>
   </div>
 
-  <div class="card">
-    <div class="info">
-      <strong>Warum kostet die Zahlung Geld?</strong><br><br>
-      Ohne Kostenschwelle könnten Angreifer massenhaft Fake-Recovery-Commands über die öffentlichen Nostr-Relays schicken. Die Gebühr finanziert Monitoring unserer offiziell gelisteten Relays und schützt dein Handy vor Spam-Angriffen.<br><br>
-      
-      <strong>🎉 Launch-Angebot:</strong> Für die ersten 1.000 Kunden ist auch die Zahlung kostenlos!
-    </div>
+  
+
+  <</div>
   </div>
 
-  <div class="price-section">
-    <div style="font-family:monospace;font-size:13px;opacity:0.8;letter-spacing:2px">RECOVERY-GEBÜHR</div>
-    <div class="price">49,00 €</div>
-    <div style="font-size:13px;opacity:0.8">Launch-Angebot: Ersten 1.000 Kunden kostenlos</div>
-  </div>
-
-  <div class="card">
-    <h2>Zahlungsmethode wählen</h2>
-    <div class="payment-grid">
-      <div class="payment" onclick="pay('paypal','49')"><div class="payment-icon">💳</div>PayPal<small>Käuferschutz</small></div>
-      <div class="payment" onclick="pay('klarna','49')"><div class="payment-icon">🅺</div>Klarna<small>Sofortüberweisung</small></div>
-      <div class="payment" onclick="pay('card','49')"><div class="payment-icon">💰</div>Kreditkarte<small>Visa/MasterCard</small></div>
-      <div class="payment" onclick="pay('sepa','49')"><div class="payment-icon">🏦</div>SEPA<small>EPC-QR-Code</small></div>
-      <div class="payment" onclick="pay('xmr','49')"><div class="payment-icon">🔒</div>Monero<small>100% anonym</small></div>
-      <div class="payment" onclick="pay('btc','49')"><div class="payment-icon">₿</div>Bitcoin<small>Lightning</small></div>
-    </div>
+  
   </div>
 
   <footer>
@@ -115,20 +96,10 @@
   </footer>
 </div>
 
-<div class="modal-overlay" id="paymentModal" onclick="if(event.target===this)closeModal()">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal()">×</button>
-    <h2 id="modalTitle">Zahlung</h2>
-    <div id="modalContent"></div>
-  </div>
-</div>
+
 
 <script>
-const WALLETS = {
-  btc: {addr:'bc1qexampleonyxvaultbtcaddress000000000000', amount:'0.0008', coin:'BTC', amountEUR:'49'},
-  xmr: {addr:'48ExampleOnyxVaultMoneroAddressGoesHere0000000000000000000000000000000000000000000000000000000000', amount:'0.33', coin:'XMR', amountEUR:'49'},
-  eth: {addr:'0xExampleOnyxVaultEthereumAddress0000000000', amount:'0.015', coin:'ETH', amountEUR:'49'}
-};
+
 
 // ===== WEG B: Master-QR Upload =====
 document.addEventListener('DOMContentLoaded', () => {
@@ -184,61 +155,23 @@ function loadImage(file) {
 }
 
 // ===== PAYMENT MODAL =====
-function closeModal() { document.getElementById('paymentModal').classList.remove('active'); }
 
-function copyAddr(id) {
-  const el = document.getElementById(id);
-  navigator.clipboard.writeText(el.textContent.trim()).then(() => {
-    const btn = document.getElementById(id + '_btn');
-    btn.textContent = '✓ KOPIERT!';
-    btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = '📋 Adresse kopieren'; btn.classList.remove('copied'); }, 2000);
-  });
-}
 
-function pay(method, amount) {
+async function sendRecoveryNow() {
   if (!Hermes.isReady()) {
-    alert('Bitte zuerst Master-QR hochladen (die Zahlung).');
+    alert('Bitte zuerst Master-QR hochladen.');
     return;
   }
-  const modal = document.getElementById('paymentModal');
-  const title = document.getElementById('modalTitle');
-  const content = document.getElementById('modalContent');
-  const names = {paypal:'PayPal', klarna:'Klarna', card:'Kreditkarte', sepa:'SEPA', xmr:'Monero', btc:'Bitcoin'};
-  title.textContent = names[method] + ' — ' + amount + '€';
+  if (!confirm('Recovery-Befehl JETZT senden?
 
-  if (method === 'btc' || method === 'xmr' || method === 'eth') {
-    const w = WALLETS[method];
-    content.innerHTML =
-      '<div class="wallet-info">🎉 <strong>Launch-Angebot:</strong> Für die ersten 1.000 Kunden kostenlos! Klick unten um ohne Zahlung zu starten, oder sende die Summe an die Wallet.</div>'+
-      '<div class="wallet-section">'+
-        '<div class="wallet-coin">SENDE AN DIESE '+w.coin+'-ADRESSE</div>'+
-        '<div class="wallet-amount">'+w.amount+' '+w.coin+'</div>'+
-        '<div style="font-size:12px;opacity:0.7">≈ '+w.amountEUR+' €</div>'+
-        '<div class="wallet-qr">QR wird in Produktion generiert</div>'+
-        '<div class="wallet-addr" id="addr_'+method+'">'+w.addr+'</div>'+
-        '<button class="btn-copy" id="addr_'+method+'_btn" onclick="copyAddr(\'addr_'+method+'\')">📋 Adresse kopieren</button>'+
-      '</div>'+
-      '<button class="wallet-connect-btn" onclick="activateFreeMode()">🎉 Launch-Angebot nutzen (kostenlos)</button>'+
-      '<div style="text-align:center;margin-top:12px;font-size:12px;opacity:0.6">Zahlung wird automatisch erkannt sobald '+w.coin+'-TX bestätigt ist.</div>';
-  } else {
-    content.innerHTML =
-      '<div class="wallet-info">🎉 <strong>Launch-Angebot:</strong> Für die ersten 1.000 Kunden kostenlos!</div>'+
-      '<div class="wallet-section">'+
-        '<div class="wallet-coin">BEZAHLE MIT '+names[method].toUpperCase()+'</div>'+
-        '<div class="wallet-amount">'+amount+' €</div>'+
-        '<div style="font-size:13px;opacity:0.8;margin-top:16px">In Produktion öffnet sich hier dein '+names[method]+'-Zahlungsdialog.</div>'+
-      '</div>'+
-      '<button class="wallet-connect-btn" onclick="activateFreeMode()">🎉 Launch-Angebot nutzen (kostenlos)</button>';
-  }
-  modal.classList.add('active');
-}
-
-async function activateFreeMode() {
-  closeModal();
+Dein Handy entsperrt sich beim nächsten Online-gehen (bis 24h).')) return;
   const res = await Hermes.sendRecoveryCommand(null);
   if (res.ok) {
-    alert('✅ Recovery-Befehl gesendet an ' + res.relaysReached + '/' + res.relaysTotal + ' Nostr-Relays!\n\nEvent-ID: ' + res.eventId.substring(0,16) + '...\n\nSobald dein Handy online geht, entsperrt sich die App automatisch.\nMaximal 24h Zustellzeit.');
+    alert('✅ Recovery-Befehl gesendet an ' + res.relaysReached + '/' + res.relaysTotal + ' Nostr-Relays!
+
+Event-ID: ' + res.eventId.substring(0,16) + '...
+
+Max. 24h Zustellzeit.');
   } else {
     alert('❌ Nostr-Versand fehlgeschlagen: ' + (res.error || 'unbekannt'));
   }
