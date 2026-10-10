@@ -27,40 +27,19 @@
   <div class="hero">
     <h1>App-Zugang wiederherstellen</h1>
     <p>Passphrase vergessen oder zu viele PIN-Fehlversuche? Zwei Wege führen zum Entsperren — <strong>ohne Datenverlust</strong>:</p>
-    <p style="font-size:14px;opacity:0.9">
-      🔑 <strong>Weg A:</strong> 5-Wort-Passphrase (kostenlos, sofort) &nbsp;·&nbsp;
-      📁 <strong>Weg B:</strong> Recovery-QR + Zahlung (bis 24h)
-    </p>
+    
   </div>
 
   <div class="card">
     <div class="warn">
-      <strong>⚠️ Voraussetzung:</strong> Du musst zuvor <strong>kostenlos registriert</strong> sein (siehe <a href="register.html" style="color:var(--teal)">Registrierung</a>). Ohne Recovery-QR oder gespeicherte 5-Wort-Passphrase gibt es keinen Weg zurück.
+      <strong>⚠️ Voraussetzung:</strong> Du musst zuvor <strong>kostenlos registriert</strong> sein (siehe <a href="register.html" style="color:var(--teal)">Registrierung</a>). Ohne Recovery-QR gibt es keinen Weg zurück.
     </div>
   </div>
 
-  <!-- ============ WEG A: 5-Wort-Passphrase ============ -->
+  
   <div class="card">
-    <h2>🔑 Weg A — 5-Wort-Passphrase (kostenlos & sofort)</h2>
-    <p>Gib deine 5 BIP-39 Wörter ein (nicht Klein-/Großschreibung-empfindlich). Der Hash wird lokal berechnet und signiert über das Nostr-Relay-Netzwerk an dein Handy gesendet. Dein Handy prüft gegen seinen Hardware-Keystore-Hash und entsperrt sich bei Match.</p>
-    <div class="phrase-grid">
-      <input type="text" class="phrase-input" id="w1" placeholder="Wort 1" autocomplete="off" spellcheck="false">
-      <input type="text" class="phrase-input" id="w2" placeholder="Wort 2" autocomplete="off" spellcheck="false">
-      <input type="text" class="phrase-input" id="w3" placeholder="Wort 3" autocomplete="off" spellcheck="false">
-      <input type="text" class="phrase-input" id="w4" placeholder="Wort 4" autocomplete="off" spellcheck="false">
-      <input type="text" class="phrase-input" id="w5" placeholder="Wort 5" autocomplete="off" spellcheck="false">
-    </div>
-    <button class="btn" style="width:100%" onclick="unlockWithPassphrase()">🔓 Mit Passphrase entsperren</button>
-    <div id="phraseStatus" style="margin-top:14px;text-align:center;font-family:monospace;font-size:13px"></div>
-    <div class="info" style="margin-top:16px;font-size:12px">
-      <strong>Sicherheit:</strong> Die Passphrase wird <strong>niemals</strong> übertragen oder gespeichert. Nur ein nicht-umkehrbarer SHA-256-Hash wird signiert versendet. 5 Fehlversuche in Folge → dein Handy führt automatisch eine forensische Löschung aus.
-    </div>
-  </div>
-
-  <!-- ============ WEG B: Recovery-QR + Payment ============ -->
-  <div class="card">
-    <h2>📁 Weg B — Recovery-QR + Zahlung</h2>
-    <p>Du hast deine 5-Wort-Passphrase vergessen? Lade deinen Recovery-QR hoch (den du bei der Registrierung erzeugt hast). Nach Zahlungseingang wird ein signierter Recovery-Befehl über die Nostr-Relays verteilt.</p>
+    <h2>Master-QR hochladen</h2>
+    <p>Lade deinen Master-QR hoch (den du bei der Registrierung erzeugt hast). Nach Zahlungseingang wird ein signierter Recovery-Befehl über die Nostr-Relays verteilt.</p>
     <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
       <div class="upload-icon">📁</div>
       <div><strong>Hier klicken oder Recovery-QR reinziehen</strong></div>
@@ -78,7 +57,7 @@
 
   <div class="card">
     <h2>So funktioniert Recovery via QR</h2>
-    <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Recovery-QR hochladen</strong><br>Deine Identität wird lokal im Browser entschlüsselt (Argon2id + optional 5-Wort-Passphrase).</div></div>
+    <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Recovery-QR hochladen</strong><br>Deine Identität wird lokal im Browser entschlüsselt (AES-GCM mit App-ID als Key).</div></div>
     <div class="step"><div class="step-num">2</div><div class="step-text"><strong>App-ID extrahieren</strong><br>Nostr-Pubkey und App-ID werden aus dem QR-Code extrahiert. Private Keys bleiben nur im RAM.</div></div>
     <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Zahlung durchführen</strong><br>Wähle eine Zahlungsmethode. Die Zahlung dient als Anti-Spam-Schutz und Infrastruktur-Kostendeckung.</div></div>
     <div class="step"><div class="step-num">4</div><div class="step-text"><strong>Signierter Recovery-Befehl übers Nostr-Netzwerk</strong><br>Nach Zahlungseingang wird ein kryptografisch signiertes Event (NIP-01, Kind 30081) an alle Nostr-Relays verteilt. Weder wir noch die Relays kennen deinen App-Inhalt.</div></div>
@@ -99,21 +78,21 @@
 
   <div class="card">
     <div class="info">
-      <strong>Warum kostet Weg B Geld?</strong><br><br>
+      <strong>Warum kostet die Zahlung Geld?</strong><br><br>
       Ohne Kostenschwelle könnten Angreifer massenhaft Fake-Recovery-Commands über die öffentlichen Nostr-Relays schicken. Die Gebühr finanziert Monitoring unserer offiziell gelisteten Relays und schützt dein Handy vor Spam-Angriffen.<br><br>
-      <strong>Kostenlos:</strong> Weg A (5-Wort-Passphrase) ist jederzeit frei.<br><br>
-      <strong>🎉 Launch-Angebot:</strong> Für die ersten 1.000 Kunden ist auch Weg B kostenlos!
+      
+      <strong>🎉 Launch-Angebot:</strong> Für die ersten 1.000 Kunden ist auch die Zahlung kostenlos!
     </div>
   </div>
 
   <div class="price-section">
-    <div style="font-family:monospace;font-size:13px;opacity:0.8;letter-spacing:2px">RECOVERY-GEBÜHR (WEG B)</div>
+    <div style="font-family:monospace;font-size:13px;opacity:0.8;letter-spacing:2px">RECOVERY-GEBÜHR</div>
     <div class="price">49,00 €</div>
     <div style="font-size:13px;opacity:0.8">Launch-Angebot: Ersten 1.000 Kunden kostenlos</div>
   </div>
 
   <div class="card">
-    <h2>Zahlungsmethode wählen (nur für Weg B)</h2>
+    <h2>Zahlungsmethode wählen</h2>
     <div class="payment-grid">
       <div class="payment" onclick="pay('paypal','49')"><div class="payment-icon">💳</div>PayPal<small>Käuferschutz</small></div>
       <div class="payment" onclick="pay('klarna','49')"><div class="payment-icon">🅺</div>Klarna<small>Sofortüberweisung</small></div>
@@ -150,30 +129,6 @@ const WALLETS = {
   xmr: {addr:'48ExampleOnyxVaultMoneroAddressGoesHere0000000000000000000000000000000000000000000000000000000000', amount:'0.33', coin:'XMR', amountEUR:'49'},
   eth: {addr:'0xExampleOnyxVaultEthereumAddress0000000000', amount:'0.015', coin:'ETH', amountEUR:'49'}
 };
-
-// ===== WEG A: 5-Wort-Passphrase =====
-async function unlockWithPassphrase() {
-  const words = ['w1','w2','w3','w4','w5'].map(id => document.getElementById(id).value.trim().toLowerCase()).filter(Boolean);
-  if (words.length !== 5) {
-    OnyxUI.status('phraseStatus', '❌ Bitte alle 5 Wörter ausfüllen', 'err');
-    return;
-  }
-  OnyxUI.status('phraseStatus', '⚙️ Signiere und sende an Nostr-Relays...');
-  const phrase = words.join(' ');
-  try {
-    const res = await Hermes.sendRecoveryWithPassphrase(phrase);
-    if (res.ok) {
-      OnyxUI.status('phraseStatus', '✅ Challenge gesendet an ' + res.relaysReached + '/' + res.relaysTotal + ' Relays — Hash: ' + res.hashSent, 'ok');
-      setTimeout(() => alert('✅ Passphrase-Challenge verteilt!\n\nSobald dein Handy online geht und einen passenden Hash-Match findet, entsperrt es sich automatisch.\n\nMaximal 24 Stunden Zustellzeit.'), 300);
-    } else {
-      OnyxUI.status('phraseStatus', '❌ ' + (res.error || 'Nostr-Fehler'), 'err');
-    }
-  } catch (e) {
-    OnyxUI.status('phraseStatus', '❌ ' + e.message, 'err');
-  }
-  // Clear inputs sofort
-  ['w1','w2','w3','w4','w5'].forEach(id => document.getElementById(id).value = '');
-}
 
 // ===== WEG B: Recovery-QR Upload =====
 document.addEventListener('DOMContentLoaded', () => {
@@ -243,7 +198,7 @@ function copyAddr(id) {
 
 function pay(method, amount) {
   if (!Hermes.isReady()) {
-    alert('Bitte zuerst Recovery-QR hochladen (Weg B).');
+    alert('Bitte zuerst Recovery-QR hochladen (die Zahlung).');
     return;
   }
   const modal = document.getElementById('paymentModal');
