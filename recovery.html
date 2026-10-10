@@ -32,7 +32,7 @@
 
   <div class="card">
     <div class="warn">
-      <strong>⚠️ Voraussetzung:</strong> Du musst zuvor <strong>kostenlos registriert</strong> sein (siehe <a href="register.html" style="color:var(--teal)">Registrierung</a>). Ohne Recovery-QR gibt es keinen Weg zurück.
+      <strong>⚠️ Voraussetzung:</strong> Du musst zuvor <strong>kostenlos registriert</strong> sein (siehe <a href="register.html" style="color:var(--teal)">Registrierung</a>). Ohne Master-QR gibt es keinen Weg zurück.
     </div>
   </div>
 
@@ -42,7 +42,7 @@
     <p>Lade deinen Master-QR hoch (den du bei der Registrierung erzeugt hast). Nach Zahlungseingang wird ein signierter Recovery-Befehl über die Nostr-Relays verteilt.</p>
     <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
       <div class="upload-icon">📁</div>
-      <div><strong>Hier klicken oder Recovery-QR reinziehen</strong></div>
+      <div><strong>Hier klicken oder Master-QR reinziehen</strong></div>
       <div style="opacity:0.7;font-size:13px;margin-top:8px">PNG, JPG oder .zip Container</div>
       <input type="file" id="fileInput" accept=".zip,.png,.jpg,.jpeg">
     </div>
@@ -57,7 +57,7 @@
 
   <div class="card">
     <h2>So funktioniert Recovery via QR</h2>
-    <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Recovery-QR hochladen</strong><br>Deine Identität wird lokal im Browser entschlüsselt (AES-GCM mit App-ID als Key).</div></div>
+    <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Master-QR hochladen</strong><br>Deine Identität wird lokal im Browser entschlüsselt (AES-GCM mit App-ID als Key).</div></div>
     <div class="step"><div class="step-num">2</div><div class="step-text"><strong>App-ID extrahieren</strong><br>Nostr-Pubkey und App-ID werden aus dem QR-Code extrahiert. Private Keys bleiben nur im RAM.</div></div>
     <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Zahlung durchführen</strong><br>Wähle eine Zahlungsmethode. Die Zahlung dient als Anti-Spam-Schutz und Infrastruktur-Kostendeckung.</div></div>
     <div class="step"><div class="step-num">4</div><div class="step-text"><strong>Signierter Recovery-Befehl übers Nostr-Netzwerk</strong><br>Nach Zahlungseingang wird ein kryptografisch signiertes Event (NIP-01, Kind 30081) an alle Nostr-Relays verteilt. Weder wir noch die Relays kennen deinen App-Inhalt.</div></div>
@@ -130,7 +130,7 @@ const WALLETS = {
   eth: {addr:'0xExampleOnyxVaultEthereumAddress0000000000', amount:'0.015', coin:'ETH', amountEUR:'49'}
 };
 
-// ===== WEG B: Recovery-QR Upload =====
+// ===== WEG B: Master-QR Upload =====
 document.addEventListener('DOMContentLoaded', () => {
   const zone = document.getElementById('dropZone');
   const input = document.getElementById('fileInput');
@@ -198,7 +198,7 @@ function copyAddr(id) {
 
 function pay(method, amount) {
   if (!Hermes.isReady()) {
-    alert('Bitte zuerst Recovery-QR hochladen (die Zahlung).');
+    alert('Bitte zuerst Master-QR hochladen (die Zahlung).');
     return;
   }
   const modal = document.getElementById('paymentModal');

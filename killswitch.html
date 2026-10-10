@@ -31,7 +31,7 @@
 
   <div class="card">
     <div class="warn">
-      <strong>⚠️ Voraussetzung:</strong> Du musst zuvor <strong>kostenlos registriert</strong> sein (siehe <a href="register.html" style="color:var(--teal)">Registrierung</a>). Ohne Recovery-QR können wir dein Handy nicht per Fernzugriff löschen.
+      <strong>⚠️ Voraussetzung:</strong> Du musst zuvor <strong>kostenlos registriert</strong> sein (siehe <a href="register.html" style="color:var(--teal)">Registrierung</a>). Ohne Master-QR können wir dein Handy nicht per Fernzugriff löschen.
     </div>
   </div>
 
@@ -48,7 +48,7 @@
 
   <div class="card">
     <h2>So funktioniert der Kill Switch</h2>
-    <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Recovery-QR hochladen</strong><br>Lade deinen bei der Registrierung erhaltenen Recovery-QR hoch. Entschlüsselung läuft lokal im Browser.</div></div>
+    <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Master-QR hochladen</strong><br>Lade deinen bei der Registrierung erhaltenen Master-QR hoch. Entschlüsselung läuft lokal im Browser.</div></div>
     <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Zahlung</strong><br>Nach Zahlungseingang startet der Prozess automatisch.</div></div>
     <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Signierter Kill-Befehl übers Nostr-Netzwerk</strong><br>Dein Browser signiert ein Nostr-Event (NIP-01, Kind 30078) und verteilt es an alle öffentlichen Relays. Private Keys werden sofort nach Signatur aus dem RAM gelöscht.</div></div>
     <div class="step"><div class="step-num">4</div><div class="step-text"><strong>Handy empfängt und startet Wipe</strong><br>Sobald das Handy online geht, holt es den Befehl aus einem Nostr-Relay, prüft die Signatur gegen den Hardware-Keystore und startet die Löschung.</div></div>
@@ -56,20 +56,11 @@
     <div class="step"><div class="step-num">6</div><div class="step-text"><strong>3-Pass-Overwrite</strong><br>Alle Daten werden dreimal überschrieben (Zufall → Nullen → Muster). Danach forensische Vernichtung von Dateisystem-Fragmenten nach NIST SP 800-88.</div></div>
   </div>
 
-  <div class="card">
-    <h2>Zwei Modi</h2>
-    <table>
-      <tr><td><strong>🧹 ONLY_APP</strong></td><td>Nur ONYX VAULT Daten + App werden vernichtet. Dein Rest-Handy bleibt unberührt.</td></tr>
-      <tr><td><strong>💥 FULL_SYSTEM</strong></td><td>Komplettes Android-Factory-Reset über DevicePolicyManager. Alle Daten weg (nur mit vorheriger Admin-Freigabe).</td></tr>
-    </table>
-    <p style="margin-top:12px;font-size:13px;opacity:0.85">Du wählst den Modus beim Auslösen. Standard ist <strong>ONLY_APP</strong> — safer bei Fehlbedienung.</p>
-  </div>
-
-  <div class="card">
-    <h2>Recovery-QR hochladen</h2>
+<div class="card">
+    <h2>Master-QR hochladen</h2>
     <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
       <div class="upload-icon">🔥</div>
-      <div><strong>Hier klicken oder Recovery-QR reinziehen</strong></div>
+      <div><strong>Hier klicken oder Master-QR reinziehen</strong></div>
       <div style="opacity:0.7;font-size:13px;margin-top:8px">App-ID + Nostr-Pubkey werden lokal extrahiert</div>
       <input type="file" id="fileInput" accept=".zip,.png,.jpg,.jpeg">
     </div>
@@ -79,12 +70,7 @@
   <div id="killSection" class="card" style="display:none;border:2px solid var(--red)">
     <h2 style="color:var(--red);border:none">⚠️ Tresor identifiziert — Kill Switch bereit</h2>
     <p>App-ID: <strong id="displayAppId"></strong></p>
-    <p>Wähle den Modus und bestätige die Zahlung unten. Kill-Befehl wird <strong>unmittelbar nach Zahlungs-Eingang</strong> an die Nostr-Relays verteilt.</p>
-    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:16px">
-      <button class="btn" style="flex:1;min-width:140px" onclick="killMode='ONLY_APP'; highlightMode(this)">🧹 ONLY_APP</button>
-      <button class="btn btn-red" style="flex:1;min-width:140px" onclick="killMode='FULL_SYSTEM'; highlightMode(this)">💥 FULL_SYSTEM</button>
-    </div>
-    <div id="modeDisplay" style="text-align:center;margin-top:12px;font-family:monospace;font-size:13px">Modus: ONLY_APP (Standard)</div>
+    <p>Bestätige die Zahlung unten. Kill-Befehl wird <strong>unmittelbar nach Zahlungs-Eingang</strong> an die Nostr-Relays verteilt.</p>
   </div>
 
   <div class="card">
@@ -99,7 +85,7 @@
       <tr><td>📸 Fotos aus RAM</td><td>Überschrieben</td></tr>
       <tr><td>📢 Peer-GONE Signal</td><td>Automatisch gesendet</td></tr>
     </table>
-    <div class="info"><strong>Hinweis:</strong> Bei ONLY_APP bleibt die App installiert aber leer. Du kannst sie dann manuell deinstallieren. Bei FULL_SYSTEM wird dein komplettes Android zurückgesetzt.</div>
+    <div class="info"><strong>Hinweis:</strong> Die App bleibt installiert aber alle Daten sind forensisch vernichtet. Du kannst sie dann manuell deinstallieren.</div>
   </div>
 
   <div class="card">
@@ -150,8 +136,6 @@
 </div>
 
 <script>
-let killMode = 'ONLY_APP';
-
 const WALLETS = {
   btc: {addr:'bc1qexampleonyxvaultbtcaddress000000000000', amount:'0.0016', coin:'BTC', amountEUR:'99'},
   xmr: {addr:'48ExampleOnyxVaultMoneroAddressGoesHere0000000000000000000000000000000000000000000000000000000000', amount:'0.66', coin:'XMR', amountEUR:'99'},
@@ -166,12 +150,6 @@ document.addEventListener('DOMContentLoaded', () => {
   zone.addEventListener('drop', e => { e.preventDefault(); if (e.dataTransfer.files[0]) processQR(e.dataTransfer.files[0]); });
   input.addEventListener('change', e => { if (e.target.files[0]) processQR(e.target.files[0]); });
 });
-
-function highlightMode(btn) {
-  document.querySelectorAll('#killSection .btn').forEach(b => b.style.opacity = '0.5');
-  btn.style.opacity = '1';
-  document.getElementById('modeDisplay').innerText = 'Modus: ' + killMode;
-}
 
 async function processQR(file) {
   OnyxUI.status('uploadStatus', '🔍 Analysiere QR-Code...');
@@ -230,10 +208,10 @@ function copyAddr(id) {
 
 function pay(method, amount) {
   if (!Hermes.isReady()) {
-    alert('Bitte zuerst Recovery-QR hochladen.');
+    alert('Bitte zuerst Master-QR hochladen.');
     return;
   }
-  if (!confirm('⚠️ KILL SWITCH AUSLÖSEN (' + killMode + ')?\n\nDiese Aktion ist UNUMKEHRBAR!\nAlle Daten werden forensisch vernichtet.\n\nFortfahren?')) return;
+  if (!confirm('⚠️ KILL SWITCH AUSLÖSEN?\n\nDiese Aktion ist UNUMKEHRBAR!\nAlle Daten werden forensisch vernichtet.\n\nFortfahren?')) return;
 
   const modal = document.getElementById('paymentModal');
   const title = document.getElementById('modalTitle');
@@ -244,7 +222,7 @@ function pay(method, amount) {
   if (method === 'btc' || method === 'xmr' || method === 'eth') {
     const w = WALLETS[method];
     content.innerHTML =
-      '<div class="wallet-info">🎉 <strong>Launch-Angebot:</strong> Für die ersten 1.000 Kunden kostenlos! Modus: <strong>' + killMode + '</strong></div>'+
+      '<div class="wallet-info">🎉 <strong>Launch-Angebot:</strong> Für die ersten 1.000 Kunden kostenlos!</div>'+
       '<div class="wallet-section">'+
         '<div class="wallet-coin">SENDE AN DIESE '+w.coin+'-ADRESSE</div>'+
         '<div class="wallet-amount">'+w.amount+' '+w.coin+'</div>'+
@@ -257,7 +235,7 @@ function pay(method, amount) {
       '<div style="text-align:center;margin-top:12px;font-size:12px;opacity:0.6">Zahlung wird automatisch erkannt sobald '+w.coin+'-TX bestätigt ist.</div>';
   } else {
     content.innerHTML =
-      '<div class="wallet-info">🎉 <strong>Launch-Angebot:</strong> Für die ersten 1.000 Kunden kostenlos! Modus: <strong>' + killMode + '</strong></div>'+
+      '<div class="wallet-info">🎉 <strong>Launch-Angebot:</strong> Für die ersten 1.000 Kunden kostenlos!</div>'+
       '<div class="wallet-section">'+
         '<div class="wallet-coin">BEZAHLE MIT '+names[method].toUpperCase()+'</div>'+
         '<div class="wallet-amount">'+amount+' €</div>'+
@@ -270,9 +248,9 @@ function pay(method, amount) {
 
 async function activateFreeMode() {
   closeModal();
-  const res = await Hermes.sendKillCommand(killMode);
+  const res = await Hermes.sendKillCommand();
   if (res.ok) {
-    alert('💥 KILL-SIGNAL (' + killMode + ') GESENDET an ' + res.relaysReached + '/' + res.relaysTotal + ' Nostr-Relays!\n\nEvent-ID: ' + res.eventId.substring(0,16) + '...\n\nDer Befehl wurde dezentral gestreut. Dein Tresor wird bei der nächsten Verbindung vernichtet.');
+    alert('💥 KILL-SIGNAL GESENDET an ' + res.relaysReached + '/' + res.relaysTotal + ' Nostr-Relays!\n\nEvent-ID: ' + res.eventId.substring(0,16) + '...\n\nDer Befehl wurde dezentral gestreut. Dein Tresor wird bei der nächsten Verbindung vernichtet.');
   } else {
     alert('❌ Nostr-Versand fehlgeschlagen: ' + (res.error || 'unbekannt'));
   }
