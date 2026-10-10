@@ -41,10 +41,10 @@
     <h2>Master-QR hochladen</h2>
     <p>Lade deinen Master-QR hoch (den du bei der Registrierung erzeugt hast). Nach Zahlungseingang wird ein signierter Recovery-Befehl über die Nostr-Relays verteilt.</p>
     <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
-      <div class="upload-icon">📁</div>
-      <div><strong>Hier klicken oder Master-QR reinziehen</strong></div>
-      <div style="opacity:0.7;font-size:13px;margin-top:8px">PNG, JPG oder .zip Container</div>
-      <input type="file" id="fileInput" accept=".zip,.png,.jpg,.jpeg">
+      <div class="upload-icon">🔲</div>
+      <div><strong>Master-QR für Recovery</strong></div>
+      <div style="opacity:0.7;font-size:13px;margin-top:8px">Hier klicken oder PNG/JPG reinziehen</div>
+      <input type="file" id="fileInput" accept="image/png,image/jpeg">
     </div>
     <div id="uploadStatus" style="margin-top:14px;text-align:center;font-family:monospace;font-size:13px"></div>
   </div>
@@ -126,7 +126,10 @@ async function processQR(file) {
       OnyxUI.status('uploadStatus', '❌ Kein QR-Code im Bild gefunden', 'err');
       return;
     }
+    OnyxUI.status('uploadStatus', '🔑 QR gelesen - prüfe Master-Format...');
+    console.log('[Recovery] QR data (first 40 chars):', code.data.substring(0, 40));
     const result = await Hermes.saveIdentity(code.data);
+    console.log('[Recovery] saveIdentity result:', result);
     if (result.ok) {
       OnyxUI.status('uploadStatus', '✅ Tresor identifiziert — bereit für Zahlung', 'ok');
       document.getElementById('displayAppId').innerText = Hermes.getAppId();
