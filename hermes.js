@@ -1,5 +1,5 @@
 /**
- * ONYX VAULT - HERMES AGENT v4.2 (App-kompatible Verschluesselung)
+ * ONYX VAULT - HERMES AGENT v4.3 (App-kompatible Verschluesselung)
  *
  * KRITISCH: Diese Datei muss BIT-GENAU das selbe Verschluesselungsformat wie
  *           EncryptionManager.encryptWithPassphrase in der App verwenden!
@@ -88,7 +88,7 @@
   }
 
   const Hermes = {
-    version: '4.2',
+    version: '4.3',
 
     _session: {
       appId: null,
@@ -139,8 +139,16 @@
           return { ok: false, error: 'QR-Inhalt ist kein gueltiges JSON (QR beschaedigt).' };
         }
 
+        // ENVELOPE-AUSPACKEN: Die App packt die Payload in einen signierten Umschlag
+        //   {p: "<payload-als-string>", s: "<signature>"}
+        // -> Payload-string parsen, Signature kann die Website nicht pruefen (ECDSA-Pub-Key fehlt)
+        if (identity && identity.p && identity.s) {
+          try { identity = JSON.parse(identity.p); }
+          catch (e) { return { ok: false, error: 'Envelope-Payload nicht lesbar.' }; }
+        }
+
         if (!identity.app_id || !identity.ks_priv || !identity.pub) {
-          return { ok: false, error: 'QR enthaelt keine gueltige Identitaet (fehlende Felder).' };
+          return { ok: false, error: 'QR enthaelt keine gueltige Identitaet (fehlende Felder: ' + Object.keys(identity).join(',') + ').' };
         }
 
         // Master-Umhuellung mit zusaetzlichen Markern
@@ -214,6 +222,12 @@
         let identity;
         try { identity = JSON.parse(plaintext); } catch (e) {
           return { ok: false, error: 'Master-QR Inhalt defekt (kein JSON).' };
+        }
+
+        // ENVELOPE-AUSPACKEN (falls Master noch Envelope-Format hat)
+        if (identity && identity.p && identity.s) {
+          try { identity = JSON.parse(identity.p); }
+          catch (e) { return { ok: false, error: 'Envelope-Payload nicht lesbar.' }; }
         }
 
         if (identity.type !== 'MASTER') {
