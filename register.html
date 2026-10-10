@@ -26,7 +26,7 @@
 
   <div class="hero">
     <h1>App-Registrierungs-QR in Master-QR umwandeln</h1>
-    <p>Lade deinen <strong>App-Registrierungs-QR</strong> (den du in der App unter "Mein App-Reg-Code" findest) hier hoch. Die Website entschlüsselt ihn lokal in deinem Browser und erzeugt daraus deinen <strong>finalen Master-QR</strong>. Diesen brauchst du für Recovery und Kill Switch.</p>
+    <p>Lade deinen <strong>App-Registrierungs-QR</strong> hier hoch (den du in der App unter „Mein App-Reg-Code" findest). Die Website entschlüsselt ihn lokal in deinem Browser und erzeugt daraus deinen <strong>finalen Master-QR</strong>. Diesen brauchst du für Recovery und Kill Switch.</p>
     <span class="badge">0 EUR</span>
     <span class="badge">OHNE EMAIL</span>
     <span class="badge">ZERO-SERVER</span>
@@ -37,8 +37,8 @@
     <div class="info">
       <strong>Ablauf in 4 Schritten:</strong>
       <ol style="margin:8px 0 0 20px;line-height:1.9">
-        <li>App öffnen → Einstellungen → <em>"Mein App-Reg-Code"</em> → QR speichern/teilen</li>
-        <li>QR hier unten reinziehen oder hochladen</li>
+        <li>App öffnen → Einstellungen → <em>„Mein App-Reg-Code"</em> → QR speichern/teilen</li>
+        <li>Den gespeicherten QR hier unten reinziehen oder hochladen</li>
         <li>Master-QR wird im Browser generiert</li>
         <li>Master-QR herunterladen und <strong>3-fach sichern</strong></li>
       </ol>
@@ -47,7 +47,7 @@
 
   <div class="card">
     <h2>1. Registrierungs-QR hochladen</h2>
-    <p>Alle Verarbeitung läuft lokal in deinem Browser. <strong>Nichts wird an uns gesendet.</strong> Der QR wird mit deiner App-ID als Schlüssel-Basis entschlüsselt (PBKDF2-SHA256, 600.000 Iterationen).</p>
+    <p>Alle Verarbeitung läuft lokal in deinem Browser. <strong>Nichts wird an uns gesendet.</strong></p>
     <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
       <div class="upload-icon">📱</div>
       <div><strong>Hier klicken oder Reg-QR reinziehen</strong></div>
@@ -57,29 +57,25 @@
     <div id="uploadStatus" style="margin-top:14px;text-align:center;font-family:monospace;font-size:13px"></div>
   </div>
 
-  <!-- Passphrase-Eingabe falls ONYX3P -->
-  <div class="card" id="passphraseCard" style="display:none">
-    <h2>2. Cloud-Passwort erforderlich</h2>
-    <p>Dein QR wurde beim Erzeugen mit einem Zusatz-Passwort geschützt. Gib es hier ein, damit wir den Inhalt entschlüsseln können.</p>
-    <input type="password" id="userPassphrase" class="token-textarea" style="height:48px" placeholder="Zusatz-Passwort">
-    <button class="btn" style="width:100%;margin-top:12px" onclick="processWithPassphrase()">🔓 Entschlüsseln</button>
-  </div>
-
   <!-- Master-QR Resultat -->
   <div class="card" id="masterSection" style="display:none;border:1px solid var(--teal)">
     <h2 style="color:var(--teal);border:none">✅ MASTER-QR BEREIT</h2>
     <p><strong>App-ID:</strong> <code id="displayAppId"></code></p>
-    <p style="font-size:13px;opacity:0.85;margin:12px 0">Dies ist dein finaler Master-QR. Lade ihn herunter und sichere ihn an mindestens 3 sicheren Orten. Du brauchst ihn für Recovery UND Kill Switch — <strong>der App-Reg-QR allein reicht nicht!</strong></p>
+    <p style="font-size:13px;opacity:0.85;margin:12px 0">
+      Dies ist dein finaler Master-QR. Lade ihn herunter und sichere ihn an mindestens 3 sicheren Orten.
+      Du brauchst ihn für Recovery UND Kill Switch — <strong>der App-Reg-QR allein reicht nicht!</strong>
+    </p>
     <div style="text-align:center">
-      <canvas id="masterQrCanvas" style="background:white;padding:16px;border-radius:12px;margin:16px auto;display:block;max-width:100%"></canvas>
-      <a id="downloadLink" class="btn" style="background:var(--teal);color:var(--bg)" download="ONYX_VAULT_MASTER.png">📥 Master-QR als PNG herunterladen</a>
+      <div id="qrHolder" style="background:white;padding:14px;border-radius:12px;margin:16px auto;display:inline-block;max-width:95%"></div>
+      <br>
+      <a id="downloadLink" class="btn" style="background:var(--teal);color:var(--bg);margin-top:8px" download="ONYX_VAULT_MASTER.png">📥 Master-QR als PNG herunterladen</a>
     </div>
     <div class="warn" style="margin-top:16px">
       <strong>Backup-Strategie — mindestens 3-fach sichern:</strong><br>
       1️⃣ Verschlüsselter Cloud-Speicher (siehe unten)<br>
       2️⃣ Papier-Ausdruck im Safe<br>
       3️⃣ Bei vertrauensvoller Person<br><br>
-      <strong>Tipp:</strong> Falls du beim Erzeugen in der App ein Cloud-Passwort gesetzt hast, merke dir dieses — ohne das Passwort kann der Master-QR nicht entschlüsselt werden.
+      <strong>Ohne diesen Master-QR gibt es keinen Weg zurück, wenn du deine App-PIN vergisst und das Handy verlierst.</strong>
     </div>
   </div>
 
@@ -106,9 +102,6 @@
       <a href="https://signal.org" target="_blank" rel="noopener" class="payment"><div class="payment-icon">💬</div>Signal<small>Chat an dich selbst</small></a>
       <a href="https://onedrive.live.com" target="_blank" rel="noopener" class="payment"><div class="payment-icon">☁️</div>OneDrive<small>onedrive.com</small></a>
     </div>
-    <div class="warn">
-      <strong>Ohne Master-QR UND ohne 5-Wort-Passphrase gibt es keinen Weg zurück!</strong>
-    </div>
   </div>
 
   <footer>
@@ -127,8 +120,6 @@
 </div>
 
 <script>
-let pendingQrData = null;  // zwischengespeicherter rohe QR-String für Passphrase-Flow
-
 document.addEventListener('DOMContentLoaded', () => {
   const zone = document.getElementById('dropZone');
   const input = document.getElementById('fileInput');
@@ -153,32 +144,12 @@ async function processRegQrFile(file) {
       OnyxUI.status('uploadStatus', '❌ Kein QR-Code im Bild gefunden', 'err');
       return;
     }
-    pendingQrData = code.data;
-
-    // Falls ONYX3P: zuerst Passphrase abfragen
-    if (code.data.startsWith('ONYX3P:')) {
-      OnyxUI.status('uploadStatus', '🔑 Passwort-geschützter QR — bitte Passwort eingeben');
-      document.getElementById('passphraseCard').style.display = 'block';
-      document.getElementById('passphraseCard').scrollIntoView({ behavior: 'smooth' });
-      return;
-    }
-
-    // Direkt transformieren
-    OnyxUI.status('uploadStatus', '⚙️ Wandle in Master-QR um (Argon2id, ~1 Sek)...');
+    OnyxUI.status('uploadStatus', '⚙️ Wandle in Master-QR um...');
     const result = await Hermes.transformRegToMaster(code.data, null);
     renderResult(result);
-
   } catch (e) {
     OnyxUI.status('uploadStatus', '❌ ' + e.message, 'err');
   }
-}
-
-async function processWithPassphrase() {
-  const pw = document.getElementById('userPassphrase').value.trim();
-  if (!pw) { alert('Bitte Passwort eingeben'); return; }
-  OnyxUI.status('uploadStatus', '⚙️ Entschlüssele + wandle um...');
-  const result = await Hermes.transformRegToMaster(pendingQrData, pw);
-  renderResult(result);
 }
 
 function renderResult(result) {
@@ -187,52 +158,62 @@ function renderResult(result) {
     return;
   }
   OnyxUI.status('uploadStatus', '✅ Master-QR erfolgreich erzeugt', 'ok');
-  document.getElementById('passphraseCard').style.display = 'none';
   document.getElementById('masterSection').style.display = 'block';
   document.getElementById('displayAppId').innerText = result.appId;
-  const canvas = document.getElementById('masterQrCanvas');
-  // davidshimjs/qrcodejs API: haengt in einen Container, nutzt dann img oder canvas intern
-  const container = canvas.parentElement;
-  // Alte QRCode-Instanz entfernen falls vorhanden
-  if (window._lastQR) { window._lastQR.clear(); window._lastQR = null; }
-  // QRCode braucht ein DIV als Container - wir bauen eins um das canvas
-  let holder = document.getElementById('qrHolder');
-  if (!holder) {
-    holder = document.createElement('div');
-    holder.id = 'qrHolder';
-    holder.style.cssText = 'background:white;padding:16px;border-radius:12px;margin:16px auto;display:inline-block';
-    canvas.parentNode.insertBefore(holder, canvas);
-    canvas.style.display = 'none';
-  }
+
+  // davidshimjs/qrcodejs: generiert <canvas> oder <img> im Container
+  const holder = document.getElementById('qrHolder');
   holder.innerHTML = '';
+  const size = Math.min(240, Math.floor(window.innerWidth * 0.72));
   try {
-    window._lastQR = new QRCode(holder, {
+    new QRCode(holder, {
       text: result.masterQrString,
-      width: 288,
-      height: 288,
+      width: size,
+      height: size,
       colorDark: '#000000',
       colorLight: '#ffffff',
       correctLevel: QRCode.CorrectLevel.M
     });
-    // Download-Link ueber die generierte Canvas/IMG setzen
-    setTimeout(() => {
-      const genCanvas = holder.querySelector('canvas');
-      const genImg = holder.querySelector('img');
-      let dataUrl = null;
-      if (genCanvas) dataUrl = genCanvas.toDataURL('image/png');
-      else if (genImg) dataUrl = genImg.src;
-      if (dataUrl) {
-        document.getElementById('downloadLink').href = dataUrl;
-      }
-      document.getElementById('masterSection').scrollIntoView({ behavior: 'smooth' });
-    }, 100);
   } catch (e) {
-    console.error('QR-render error:', e);
     alert('QR-Rendering fehlgeschlagen: ' + e.message);
+    return;
   }
-  // Pending-Data löschen (RAM)
-  pendingQrData = null;
-  document.getElementById('userPassphrase').value = '';
+
+  // Download-Link setzen - robust: Mehrere Versuche mit Delays
+  const setDownloadLink = () => {
+    const cv = holder.querySelector('canvas');
+    const im = holder.querySelector('img');
+    let url = null;
+    if (cv) {
+      try { url = cv.toDataURL('image/png'); } catch (e) {}
+    }
+    if (!url && im) {
+      url = im.src;
+    }
+    if (url) {
+      document.getElementById('downloadLink').href = url;
+      return true;
+    }
+    return false;
+  };
+  // Erst sofort versuchen, dann nach 100/300/700/1500ms
+  if (!setDownloadLink()) {
+    [100, 300, 700, 1500].forEach(ms => setTimeout(setDownloadLink, ms));
+  }
+
+  // Styling für QR anpassen (davidshimjs setzt feste Grössen)
+  setTimeout(() => {
+    const cv = holder.querySelector('canvas');
+    const im = holder.querySelector('img');
+    [cv, im].forEach(el => {
+      if (el) {
+        el.style.maxWidth = '100%';
+        el.style.height = 'auto';
+        el.style.display = 'block';
+      }
+    });
+    document.getElementById('masterSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 150);
 }
 
 function loadImage(file) {
