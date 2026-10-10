@@ -1,0 +1,125 @@
+/* ONYX VAULT v4 — Dark Teal Theme (consistent across all pages) */
+:root{
+  --bg:#0a0a0f;--bg2:#111;
+  --teal:#00e5ff;--teal-bright:#00ffdd;--teal-dim:rgba(0,229,255,0.1);
+  --silver:#c8d8e8;--onyx:#1a1a1a;--red:#ff3b58;--muted:#666;
+  --green-success:#4caf50;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{min-height:100%;overflow-x:hidden}
+body{
+  background:var(--bg);color:var(--silver);
+  font-family:'Rajdhani','Segoe UI',sans-serif;line-height:1.7;
+  padding:16px;padding-bottom:140px;
+  background-image:radial-gradient(circle at 20% 10%,rgba(0,229,255,0.04) 0%,transparent 50%),
+                   radial-gradient(circle at 80% 90%,rgba(0,229,255,0.03) 0%,transparent 50%);
+}
+.container{max-width:960px;margin:0 auto}
+header{
+  text-align:center;padding:32px 0 24px;border-bottom:1px solid #222;margin-bottom:24px;
+  display:flex;flex-direction:column;align-items:center;gap:12px
+}
+.logo-img{width:72px;height:72px;object-fit:contain;filter:drop-shadow(0 0 20px rgba(0,229,255,0.4))}
+.logo{font-family:'Cinzel',serif;font-size:34px;letter-spacing:4px}
+.logo .onyx{color:#fff}
+.logo .vault{color:var(--teal);text-shadow:0 0 20px rgba(0,229,255,0.4)}
+.tagline{font-family:monospace;font-size:11px;color:var(--silver);opacity:0.6;letter-spacing:2px}
+nav{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:20px 0 32px}
+nav a{color:var(--silver);text-decoration:none;padding:10px 18px;border:1px solid #333;border-radius:6px;font-family:monospace;font-size:13px;transition:0.25s;letter-spacing:1px}
+nav a:hover,nav a.active{border-color:var(--teal);color:var(--teal);background:var(--teal-dim)}
+h1{font-family:'Cinzel',serif;font-size:26px;color:var(--teal);margin:0 0 16px;letter-spacing:2px;line-height:1.3}
+h2{font-family:'Cinzel',serif;font-size:20px;color:var(--silver);margin:28px 0 14px;letter-spacing:1px;padding-bottom:8px;border-bottom:1px solid #222}
+h3{color:var(--teal);font-size:15px;margin:16px 0 8px;letter-spacing:0.5px}
+p{margin:12px 0}
+.card{background:rgba(17,17,17,0.65);border:1px solid #222;border-radius:10px;padding:24px;margin-bottom:20px;overflow:hidden;word-wrap:break-word}
+.hero{text-align:center;padding:40px 24px;background:linear-gradient(135deg,rgba(0,229,255,0.08) 0%,transparent 70%);border:1px solid rgba(0,229,255,0.2);border-radius:14px;margin-bottom:36px}
+.hero h1{font-size:30px;line-height:1.3}
+.hero p{font-size:16px;max-width:680px;margin:16px auto;opacity:0.95}
+.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin:28px 0}
+.feature{background:rgba(0,229,255,0.03);border-left:3px solid var(--teal);padding:20px;border-radius:4px;transition:0.25s;min-width:0;overflow:hidden}
+.feature:hover{background:rgba(0,229,255,0.06);transform:translateX(4px)}
+.feature-icon{font-size:30px;margin-bottom:10px;display:block}
+.feature h3{margin-top:0}
+.feature p{font-size:14px}
+.btn{display:inline-block;background:var(--teal);color:var(--bg);padding:14px 28px;border:none;border-radius:6px;font-family:monospace;font-weight:bold;cursor:pointer;text-decoration:none;letter-spacing:1px;font-size:14px;transition:0.2s}
+.btn:hover{background:var(--teal-bright);box-shadow:0 4px 20px rgba(0,229,255,0.4)}
+.btn-red{background:var(--red);color:#fff}
+.btn-red:hover{background:#ff5577;box-shadow:0 4px 20px rgba(255,59,88,0.4)}
+.badge{display:inline-block;padding:5px 12px;background:var(--teal-dim);border:1px solid var(--teal);color:var(--teal);font-family:monospace;font-size:11px;border-radius:4px;margin:4px 4px 4px 0;letter-spacing:1px}
+.badge-red{background:rgba(255,59,88,0.1);border-color:var(--red);color:var(--red)}
+.step{display:flex;gap:16px;margin:16px 0;align-items:flex-start}
+.step-num{background:var(--teal);color:var(--bg);width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;flex-shrink:0;font-family:monospace;font-size:14px}
+.step-text{flex:1;padding-top:4px;min-width:0;word-wrap:break-word}
+.payment-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin:20px 0}
+.payment{background:var(--onyx);border:1px solid #333;padding:18px;text-align:center;border-radius:8px;cursor:pointer;transition:0.2s;text-decoration:none;color:var(--silver);display:block}
+.payment:hover{border-color:var(--teal);transform:translateY(-2px);background:var(--teal-dim);color:var(--teal)}
+.payment-icon{font-size:28px;margin-bottom:6px}
+.payment small{display:block;opacity:0.6;font-size:11px;margin-top:2px}
+.warn{background:rgba(255,59,88,0.08);border-left:3px solid var(--red);padding:16px 20px;margin:16px 0;font-size:14px;border-radius:4px}
+.info{background:rgba(0,229,255,0.05);border-left:3px solid var(--teal);padding:16px 20px;margin:16px 0;font-size:14px;border-radius:4px}
+.success{background:rgba(76,175,80,0.08);border-left:3px solid var(--green-success);padding:16px 20px;margin:16px 0;font-size:14px;border-radius:4px}
+.price-section{text-align:center;padding:32px 20px;background:var(--teal-dim);border-radius:12px;margin:32px 0}
+.price{font-family:'Cinzel',serif;font-size:48px;color:var(--teal);margin:12px 0;font-weight:bold}
+.upload-zone{border:2px dashed var(--teal);background:var(--teal-dim);padding:40px 20px;text-align:center;border-radius:12px;margin:20px 0;cursor:pointer;transition:0.2s;position:relative}
+.upload-zone:hover{background:rgba(0,229,255,0.15);transform:translateY(-2px)}
+.upload-zone.drag-over{border-color:var(--teal-bright);background:rgba(0,229,255,0.2);transform:scale(1.02)}
+.upload-icon{font-size:48px;margin-bottom:12px}
+.upload-zone input[type=file]{display:none}
+.token-textarea{width:100%;background:var(--bg);border:1px solid var(--teal);color:var(--teal);padding:12px;border-radius:6px;font-family:monospace;font-size:12px;resize:vertical}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px;table-layout:fixed}
+table tr{border-bottom:1px solid #222}
+table td{padding:10px 6px;word-wrap:break-word;overflow-wrap:break-word}
+table td:first-child{color:var(--silver);font-weight:500;width:45%}
+table td:last-child{text-align:right;font-family:monospace;font-size:12px;color:var(--teal);width:55%}
+.spec-table td{font-size:12px}
+.spec-table td:last-child{font-size:11px}
+ul{margin:12px 0;padding-left:20px}
+li{margin:8px 0}
+code{background:var(--onyx);padding:3px 8px;border-radius:4px;font-family:monospace;font-size:11px;color:var(--teal);word-break:break-all}
+
+/* 5-Wort-Passphrase Grid */
+.phrase-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:20px 0}
+.phrase-input{background:var(--bg);border:1px solid #333;color:var(--teal);padding:12px 10px;border-radius:6px;font-family:monospace;font-size:14px;text-align:center;transition:0.2s}
+.phrase-input:focus{border-color:var(--teal);outline:none;background:var(--teal-dim)}
+@media (max-width:600px){.phrase-grid{grid-template-columns:repeat(5,1fr);gap:4px}.phrase-input{padding:10px 4px;font-size:12px}}
+
+footer{
+  text-align:center;padding:40px 20px 60px;margin-top:60px;
+  border-top:1px solid #222;
+  font-family:monospace;font-size:12px;opacity:0.75;
+  line-height:1.8
+}
+footer .foot-logo{font-family:'Cinzel',serif;font-size:18px;letter-spacing:3px;margin-bottom:8px}
+footer .foot-logo .onyx{color:#fff}
+footer .foot-logo .vault{color:var(--teal)}
+footer .foot-link{color:var(--silver);text-decoration:none;margin:0 8px;transition:0.2s}
+footer .foot-link:hover{color:var(--teal)}
+footer .copyright{margin-top:16px;opacity:0.6;font-size:11px;line-height:1.6}
+@media (max-width:600px){
+  .hero h1{font-size:24px}
+  h1{font-size:22px}
+  nav a{padding:8px 14px;font-size:12px}
+  .card{padding:18px}
+  .price{font-size:36px}
+  .spec-table td{font-size:11px}
+  .spec-table td:last-child{font-size:10px}
+}
+
+/* ===== PAYMENT MODAL ===== */
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);display:none;align-items:center;justify-content:center;z-index:1000;padding:16px;backdrop-filter:blur(8px)}
+.modal-overlay.active{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--teal);border-radius:16px;padding:28px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 0 40px rgba(0,229,255,0.3)}
+.modal-close{float:right;background:none;border:none;color:var(--silver);font-size:24px;cursor:pointer;padding:0;width:32px;height:32px;line-height:32px;border-radius:50%;transition:0.2s}
+.modal-close:hover{background:var(--onyx);color:var(--teal)}
+.modal h2{margin-top:0;padding-top:0;border-bottom:none;font-size:22px}
+.wallet-section{text-align:center;padding:24px;background:var(--onyx);border-radius:12px;margin:20px 0}
+.wallet-amount{font-family:'Cinzel',serif;font-size:36px;color:var(--teal);margin:8px 0;font-weight:bold}
+.wallet-coin{font-family:monospace;font-size:14px;opacity:0.7;letter-spacing:2px}
+.wallet-addr{background:var(--bg);border:1px dashed var(--teal);padding:14px;border-radius:8px;margin:16px 0;font-family:monospace;font-size:11px;word-break:break-all;color:var(--teal);line-height:1.5}
+.btn-copy{background:var(--teal);color:var(--bg);border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-family:monospace;font-weight:bold;font-size:13px;margin-top:12px;transition:0.2s}
+.btn-copy:hover{background:var(--teal-bright);transform:translateY(-1px)}
+.btn-copy.copied{background:var(--green-success);color:#fff}
+.wallet-qr{width:180px;height:180px;background:#fff;margin:16px auto;display:flex;align-items:center;justify-content:center;font-family:monospace;font-size:11px;color:#000;border-radius:12px;padding:12px}
+.wallet-connect-btn{background:linear-gradient(135deg,var(--teal) 0%,var(--teal-bright) 100%);color:var(--bg);border:none;padding:14px 28px;border-radius:8px;cursor:pointer;font-family:monospace;font-weight:bold;font-size:14px;letter-spacing:1px;width:100%;margin-top:16px;transition:0.2s}
+.wallet-connect-btn:hover{transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,229,255,0.4)}
+.wallet-info{background:var(--teal-dim);padding:12px 16px;border-radius:8px;font-size:12px;margin:16px 0;line-height:1.6}

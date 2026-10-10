@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Registrierung — ONYX VAULT</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="hermes.js"></script>
+</head>
+<body>
+<div class="container">
+  <header>
+    <img src="logo.png" alt="ONYX VAULT" class="logo-img">
+    <div class="logo"><span class="onyx">ONYX</span> <span class="vault">VAULT</span></div>
+    <div class="tagline">Registrierung — kostenlos & anonym</div>
+  </header>
+
+  <nav>
+    <a href="index.html">Übersicht</a>
+    <a href="register.html" class="active">Registrierung</a>
+    <a href="recovery.html">Recovery</a>
+    <a href="killswitch.html">Kill Switch</a>
+  </nav>
+
+  <div class="hero">
+    <h1>Komplett kostenlose Registrierung</h1>
+    <p>Die Registrierung ist <strong>100% kostenlos</strong> und benötigt weder E-Mail noch Telefonnummer. Dein Recovery-QR-Code wird <strong>Hardware-verschlüsselt</strong> aus deiner App exportiert und dient gleichzeitig als Kill-Switch-Autorisierung.</p>
+    <span class="badge">0 EUR</span>
+    <span class="badge">OHNE EMAIL</span>
+    <span class="badge">OHNE TELEFONNUMMER</span>
+    <span class="badge">ZERO-SERVER</span>
+  </div>
+
+  <div class="card" id="bridgeCard" style="display:none">
+    <div class="success">
+      <strong>✅ Hardware-Brücke erkannt!</strong><br>
+      Du hast diese Seite in der ONYX VAULT App geöffnet. Dein Registrierungs-QR wird direkt aus deinem Hardware-Keystore erzeugt — die Keys verlassen das Gerät niemals.
+    </div>
+  </div>
+
+  <div class="card" id="browserCard" style="display:none">
+    <div class="info">
+      <strong>Browser-Modus:</strong> Du hast diese Seite außerhalb der ONYX VAULT App geöffnet. Lade deinen App-QR hoch, um einen Backup-fähigen Recovery-QR zu erzeugen. Alle Verarbeitung läuft lokal — <strong>nichts verlässt deinen Browser</strong>.
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>So funktioniert die Registrierung</h2>
+    <div class="step"><div class="step-num">1</div><div class="step-text"><strong>App installieren und starten</strong><br>Die App erstellt lokal auf deinem Handy eine Identität im Hardware-Keystore (Samsung Knox / Google Titan M2 / StrongBox) — die Private Keys verlassen deinen Chip niemals.</div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Diese Seite in der App öffnen</strong><br>Menü → Einstellungen → Website → Registrierung. Die App übergibt automatisch den Hardware-verschlüsselten Export.</div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Optional: Cloud-Passwort setzen</strong><br>Setze ein zusätzliches Passwort für den QR-Code, falls du ihn in der Cloud speichern willst. Doppelter Schutz (Hardware + Passwort).</div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-text"><strong>QR-Code generieren & herunterladen</strong><br>Du bekommst einen Registrierungs-QR, der <strong>vollständig verschlüsselt</strong> ist. Dieser dient für Recovery UND Kill Switch — 3-fach sichern (Cloud, Ausdruck, Vertrauensperson).</div></div>
+  </div>
+
+  <!-- ======== BRIDGE MODE: Hardware-QR direkt aus App ======== -->
+  <div class="card" id="bridgeGenerate" style="display:none">
+    <h2>1. Cloud-Schutz Passwort (optional)</h2>
+    <p>Dieses Passwort verschlüsselt deinen QR-Code <em>zusätzlich</em>, falls du ihn in der Cloud speichern willst. Argon2id-Härtung mit 600.000 Iterationen.</p>
+    <input type="password" id="syncPassphrase" class="token-textarea" style="height:48px;margin-bottom:16px" placeholder="(leer lassen = nur Hardware-Schutz)">
+    <button class="btn" style="width:100%" onclick="generateSecureQR()">🔑 REGISTRIERUNGS-QR GENERIEREN</button>
+    <div id="bridgeStatus" style="margin-top:16px;text-align:center;font-family:monospace;font-size:13px"></div>
+  </div>
+
+  <div id="qrResultSection" class="card" style="display:none; text-align:center;">
+    <h2 style="color:var(--teal);border:none">✅ REGISTRIERUNGS-QR BEREIT</h2>
+    <canvas id="qrcode-canvas" style="background:white;padding:16px;border-radius:12px;margin:20px auto;display:block;max-width:100%"></canvas>
+    <p style="font-size:13px;margin:12px 0 20px;opacity:0.85">Speichere diesen QR an mindestens 3 sicheren Orten. Du brauchst ihn für Recovery UND Kill Switch.</p>
+    <a id="downloadLink" class="btn" style="background:var(--teal);color:var(--bg)" download="ONYX_VAULT_MASTER.png">📥 Als PNG herunterladen</a>
+    <div class="info" style="margin-top:20px;text-align:left">
+      <strong>Backup-Strategie — mindestens 3-fach sichern:</strong><br>
+      1️⃣ Verschlüsselter Cloud-Speicher (siehe unten)<br>
+      2️⃣ Papier-Ausdruck im Safe<br>
+      3️⃣ Bei vertrauensvoller Person
+    </div>
+  </div>
+
+  <!-- ======== BROWSER MODE: Upload existing App-QR ======== -->
+  <div class="card" id="browserUpload" style="display:none">
+    <h2>App-QR-Code hochladen</h2>
+    <p>Exportiere den QR aus der App (Menü → QR-Code → Teilen) und lade die Datei hier hoch. Verarbeitung läuft komplett in deinem Browser — <strong>kein Upload zu uns</strong>.</p>
+    <div class="upload-zone" id="dropZone" onclick="document.getElementById('appQrInput').click()">
+      <div class="upload-icon">📱</div>
+      <div><strong>Hier klicken oder App-QR-Code reinziehen</strong></div>
+      <div style="opacity:0.7;font-size:13px;margin-top:8px">PNG, JPG oder .zip Container</div>
+      <input type="file" id="appQrInput" accept=".png,.jpg,.jpeg,.zip">
+    </div>
+    <div id="uploadStatus" style="margin-top:16px;text-align:center;font-family:monospace;font-size:13px"></div>
+  </div>
+
+  <div class="card">
+    <h2>Was wird wo gespeichert?</h2>
+    <table>
+      <tr><td>Lokal auf deinem Handy</td><td>Alle Daten (Hardware-Container)</td></tr>
+      <tr><td>Private Master-Keys</td><td>Hardware-Keystore (unauslesbar)</td></tr>
+      <tr><td>Dein Recovery-QR</td><td>DU — 3-fach gesichert</td></tr>
+      <tr><td>Nostr-Relays (öffentlich)</td><td>Nur signierte Events, kein Klartext</td></tr>
+      <tr><td>Unsere Server</td><td>Keine (haben wir nicht)</td></tr>
+      <tr><td>Google / Apple</td><td>Keine Daten</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Recovery-QR sichern — Externe Dienste</h2>
+    <p>Nach dem Download empfehlen wir dir, den Recovery-QR mehrfach zu sichern. Hier Links zu beliebten verschlüsselten Diensten:</p>
+    <div class="payment-grid">
+      <a href="https://drive.google.com" target="_blank" rel="noopener" class="payment"><div class="payment-icon">☁️</div>Google Drive<small>drive.google.com</small></a>
+      <a href="https://www.dropbox.com" target="_blank" rel="noopener" class="payment"><div class="payment-icon">📦</div>Dropbox<small>dropbox.com</small></a>
+      <a href="https://www.icloud.com" target="_blank" rel="noopener" class="payment"><div class="payment-icon">📱</div>iCloud<small>icloud.com</small></a>
+      <a href="https://proton.me/mail" target="_blank" rel="noopener" class="payment"><div class="payment-icon">📧</div>Proton Mail<small>proton.me</small></a>
+      <a href="https://signal.org" target="_blank" rel="noopener" class="payment"><div class="payment-icon">💬</div>Signal<small>Chat an dich selbst</small></a>
+      <a href="https://onedrive.live.com" target="_blank" rel="noopener" class="payment"><div class="payment-icon">☁️</div>OneDrive<small>onedrive.com</small></a>
+    </div>
+    <div class="warn">
+      <strong>Ohne Recovery-QR UND ohne 5-Wort-Passphrase gibt es keinen Weg zurück.</strong><br>
+      Beide zusammen sichern deinen Zugang — mindestens einer muss erreichbar sein.
+    </div>
+  </div>
+
+  <footer>
+    <div class="foot-logo"><span class="onyx">ONYX</span> <span class="vault">VAULT</span></div>
+    <div>
+      <a href="index.html" class="foot-link">Übersicht</a> ·
+      <a href="register.html" class="foot-link">Registrierung</a> ·
+      <a href="recovery.html" class="foot-link">Recovery</a> ·
+      <a href="killswitch.html" class="foot-link">Kill Switch</a>
+    </div>
+    <div class="copyright">
+      © 2026 ONYX VAULT v3.0 · Open Source<br>
+      Dezentral · Verschlüsselt · Privat
+    </div>
+  </footer>
+</div>
+
+<script>
+// ========== MODE DETECTION ==========
+document.addEventListener('DOMContentLoaded', () => {
+  const hasBridge = !!window.OnyxVault;
+  document.getElementById('bridgeCard').style.display = hasBridge ? '' : 'none';
+  document.getElementById('browserCard').style.display = hasBridge ? 'none' : '';
+  document.getElementById('bridgeGenerate').style.display = hasBridge ? '' : 'none';
+  document.getElementById('browserUpload').style.display = hasBridge ? 'none' : '';
+
+  if (!hasBridge) {
+    setupDragDrop();
+  }
+});
+
+// ========== BRIDGE MODE ==========
+async function generateSecureQR() {
+  const status = document.getElementById('bridgeStatus');
+  const passphrase = document.getElementById('syncPassphrase').value;
+  let token = '';
+  try {
+    OnyxUI.status('bridgeStatus', 'Hardware-Export läuft...');
+    if (passphrase) {
+      token = Hermes.getEncryptedTokenFromBridge(passphrase);
+    } else {
+      token = Hermes.getRegistrationTokenFromBridge();
+    }
+    if (!token) {
+      OnyxUI.status('bridgeStatus', '❌ Hardware-Brücke nicht verfügbar', 'err');
+      return;
+    }
+    const canvas = document.getElementById('qrcode-canvas');
+    QRCode.toCanvas(canvas, token, { width: 320, margin: 2, color: {dark:'#000000', light:'#ffffff'} }, (err) => {
+      if (err) {
+        OnyxUI.status('bridgeStatus', '❌ QR-Erzeugung fehlgeschlagen', 'err');
+        return;
+      }
+      document.getElementById('qrResultSection').style.display = 'block';
+      document.getElementById('downloadLink').href = canvas.toDataURL('image/png');
+      OnyxUI.status('bridgeStatus', '✅ QR erfolgreich erzeugt', 'ok');
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    });
+  } catch (e) {
+    OnyxUI.status('bridgeStatus', '❌ Fehler: ' + e.message, 'err');
+  }
+}
+
+// ========== BROWSER MODE: Drag & Drop ==========
+function setupDragDrop() {
+  const zone = document.getElementById('dropZone');
+  const input = document.getElementById('appQrInput');
+  if (!zone || !input) return;
+
+  ['dragenter', 'dragover'].forEach(ev => {
+    zone.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); zone.classList.add('drag-over'); });
+  });
+  ['dragleave', 'drop'].forEach(ev => {
+    zone.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); zone.classList.remove('drag-over'); });
+  });
+  zone.addEventListener('drop', e => {
+    const file = e.dataTransfer.files[0];
+    if (file) handleAppQrFile(file);
+  });
+  input.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (file) handleAppQrFile(file);
+  });
+}
+
+function handleAppQrFile(file) {
+  const ext = (file.name.split('.').pop() || '').toLowerCase();
+  if (!['png','jpg','jpeg','zip'].includes(ext)) {
+    OnyxUI.status('uploadStatus', '❌ Nur PNG, JPG oder ZIP erlaubt', 'err');
+    return;
+  }
+  OnyxUI.status('uploadStatus', '✓ ' + file.name + ' geladen (' + Math.round(file.size/1024) + ' KB) — bereit zum Speichern');
+  // Zeige den gleichen QR als Download-Link an (es IST der Recovery-QR)
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const section = document.getElementById('qrResultSection');
+    section.style.display = 'block';
+    const canvas = document.getElementById('qrcode-canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+      document.getElementById('downloadLink').href = canvas.toDataURL('image/png');
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+</script>
+</body>
+</html>

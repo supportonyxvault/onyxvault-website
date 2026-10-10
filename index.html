@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ONYX VAULT — Dezentraler Tor-Messenger</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+  <header>
+    <img src="logo.png" alt="ONYX VAULT" class="logo-img">
+    <div class="logo"><span class="onyx">ONYX</span> <span class="vault">VAULT</span></div>
+    <div class="tagline">ZERO SERVER · ZERO TRACE · ZERO COMPROMISE</div>
+  </header>
+
+  <nav>
+    <a href="index.html" class="active">Übersicht</a>
+    <a href="register.html">Registrierung</a>
+    <a href="recovery.html">Recovery</a>
+    <a href="killswitch.html">Kill Switch</a>
+  </nav>
+
+  <div class="hero">
+    <h1>Verschlüsselt. Dezentral. Privat.</h1>
+    <p>ONYX VAULT ist ein Peer-to-Peer-Messenger, der ohne zentrale Server auskommt. Deine Nachrichten laufen durch das Tor-Netzwerk — denselben verschlüsselten Weg, den Journalisten weltweit nutzen. Es gibt keine Firma, die mitlesen könnte. Keine Datenbanken, die beschlagnahmt werden könnten. Nur dein Handy und das deines Kontakts.</p>
+    <span class="badge">v3.0 FINAL</span>
+    <span class="badge">POST-QUANTUM</span>
+    <span class="badge">HARDWARE-KEYSTORE</span>
+    <span class="badge">RAM-ONLY</span>
+    <span class="badge">NOSTR-RELAYS</span>
+  </div>
+
+  <div class="card">
+    <h2>So funktioniert ONYX VAULT (einfach erklärt)</h2>
+    <p>Stell dir vor, du und dein Freund habt jeder einen Tresor zuhause. Wenn ihr Nachrichten austauscht, läuft nichts über eine zentrale Postfiliale, sondern direkt von Tresor zu Tresor — durch verschlungene Geheimgänge (das Tor-Netzwerk), damit niemand sehen kann, wer mit wem spricht.</p>
+    <p>Die ganze App läuft in <strong>verschachtelten Containern</strong>: Jeder Container ist mit einem eigenen Schlüssel verschlossen. Deine Nachrichten liegen in einem Container, deine Kontakte in einem anderen, deine Identität in einem dritten. Wenn ihr euch über einen QR-Code als Freunde hinzufügt, generiert ihr gemeinsam einen weiteren Container — nur für euren Chat, nur mit eurem Schlüssel. Niemand sonst kann rein.</p>
+    <p>Alle Schlüssel sind so stark, dass sie nach heutigem Stand selbst mit zukünftigen Quantencomputern über Millionen Jahre nicht knackbar wären. Chats löschen sich automatisch spätestens nach 120 Sekunden forensisch — als hätten sie nie existiert.</p>
+  </div>
+
+  <div class="card">
+    <h2>Was macht ONYX VAULT besonders?</h2>
+    <div class="features">
+      <div class="feature">
+        <span class="feature-icon">🧅</span>
+        <h3>Tor-Netzwerk Routing</h3>
+        <p>Deine Nachrichten laufen über das Tor-Netzwerk mit weltweit über 7.000 Freiwilligen-Knoten. Niemand kann rückverfolgen, wer mit wem spricht — obfs4-Bridges verschleiern sogar, dass du überhaupt Tor benutzt.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">🔐</span>
+        <h3>Quanten-sichere Verschlüsselung</h3>
+        <p>Kyber-1024 + X25519 Hybrid-Handshake nach Signal-Standard. Double Ratchet mit ChaCha20-Poly1305 pro Nachricht. Sicher auch gegen zukünftige Quantencomputer.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">📱</span>
+        <h3>Hardware-Schlüsselspeicher</h3>
+        <p>Deine Master-Schlüssel werden im Sicherheits-Chip deines Handys gespeichert — Samsung Knox Vault, Google Titan M2 oder StrongBox. Selbst Behörden können sie nicht auslesen.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">💥</span>
+        <h3>RAM-Only Chat</h3>
+        <p>Nachrichten existieren nur im flüchtigen Arbeitsspeicher — nie auf der Festplatte. Nach 60/90/120 Sekunden erfolgt forensische 3-fach-Überschreibung mit Zufall, Nullen und Mustern.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">📬</span>
+        <h3>Nostr Offline-Mailbox</h3>
+        <p>Ist dein Partner offline? Deine Nachricht wird verschlüsselt auf dezentralen Nostr-Relays zwischengelagert. 72 Stunden Auto-Purge, komplett verschlüsselt — keine Metadaten einsehbar.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">🛡️</span>
+        <h3>Spyware-Scanner</h3>
+        <p>Integrierter Scanner nach Amnesty International MVT-Standard. Erkennt Pegasus, Predator, Reign und Root/Frida/Xposed-Angriffe automatisch im Hintergrund.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">📸</span>
+        <h3>Bunker-Fotos</h3>
+        <p>Fotos werden in 32KB-Fragmente zerlegt, doppelt verschlüsselt und als ZIP transportiert. EXIF-Daten (Standort, Kamera) werden entfernt. Fotos existieren nur im RAM — nie auf der Festplatte.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">🔑</span>
+        <h3>5-Wort Passphrase</h3>
+        <p>5 zufällige BIP-39 Wörter als Master-Zugang. Mit Argon2id-Härtung praktisch unknackbar — selbst mit 1.000 GPUs würde ein Angreifer über 5 Millionen Jahre brauchen. Die Wörter werden Hardware-geschützt gespeichert — kein Angreifer kann sie auslesen.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-icon">⚡</span>
+        <h3>Remote Kill Switch via Nostr</h3>
+        <p>Handy verloren? Nach kostenloser Registrierung kannst du von jedem Browser aus einen signierten Kill-Command über das dezentrale Nostr-Relay-Netzwerk auslösen. Dein Handy setzt sich beim nächsten Online-Gehen auf Werkseinstellungen zurück und benachrichtigt deine Kontakte.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Die 8 Sicherheits-Schichten</h2>
+    <p>Keine App kann sich auf eine einzige Verteidigung verlassen. ONYX VAULT hat acht aufeinander abgestimmte Schutzebenen:</p>
+    <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Verschleierter Netzwerk-Traffic:</strong> 100% Tor Onion-Services mit obfs4-Bridges. Dein Internet-Anbieter sieht nicht einmal, dass du Tor benutzt.</div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Kryptografischer Handshake:</strong> Wenn du einen Freund per QR-Code hinzufügst, generiert ihr beide gemeinsam einen Schlüssel. Dieser Schlüssel verlässt niemals eure Geräte.</div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Nachrichten-Verschlüsselung:</strong> Jede einzelne Nachricht bekommt einen eigenen Schlüssel. Selbst wenn einer kompromittiert würde, bleiben alle anderen sicher (Perfect Forward Secrecy).</div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-text"><strong>Foto-Bunker:</strong> Dreifach-Schutz durch Fragmentierung, Doppel-Verschlüsselung und EXIF-Entfernung. Fotos existieren nur im RAM.</div></div>
+    <div class="step"><div class="step-num">5</div><div class="step-text"><strong>Hardware-Container:</strong> Deine Master-Schlüssel sind im physischen Sicherheits-Chip gespeichert — unauslesbar selbst bei beschlagnahmtem Handy.</div></div>
+    <div class="step"><div class="step-num">6</div><div class="step-text"><strong>Zugangs-Schutz:</strong> 5-Wort BIP-39 Passphrase mit Argon2id-Härtung plus optionale Biometrie. Mathematisch unknackbar.</div></div>
+    <div class="step"><div class="step-num">7</div><div class="step-text"><strong>Anti-Forensik:</strong> Erkennung von Root, Debug-Modus, Spyware und Analyse-Tools. Bei Verdacht sofortige Datenlöschung.</div></div>
+    <div class="step"><div class="step-num">8</div><div class="step-text"><strong>Remote Kill Switch via Nostr:</strong> Nach kostenloser Registrierung kannst du von überall einen Werkseinstellungen-Reset über das Nostr-Relay-Netzwerk auslösen und alle Kontakte benachrichtigen.</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Zero-Server Architektur</h2>
+    <p>ONYX VAULT betreibt <strong>keinen einzigen Server</strong>. Weder für Chats noch für Recovery oder Kill Switch. Alle Kommunikation läuft über zwei dezentrale Netzwerke:</p>
+    <div class="step"><div class="step-num">🧅</div><div class="step-text"><strong>Tor-Netzwerk</strong> — für direkte Peer-to-Peer-Chats über Onion-Services. 7.000+ öffentliche Knoten weltweit.</div></div>
+    <div class="step"><div class="step-num">📬</div><div class="step-text"><strong>Nostr-Relays</strong> — für Offline-Mailbox, Recovery- und Kill-Commands. Öffentliche, dezentrale WebSocket-Relays. Du kannst eigene nutzen.</div></div>
+    <div class="info"><strong>Was heißt das für dich?</strong> Keine Firma kann abgeschaltet werden. Keine Datenbank beschlagnahmt. Kein zentraler Betreiber hat jemals Einblick in deine Daten.</div>
+  </div>
+
+  <div class="card">
+    <h2>Für wen ist ONYX VAULT?</h2>
+    <table>
+      <tr><td>🎙️ Journalisten</td><td>Quellenschutz</td></tr>
+      <tr><td>⚖️ Anwälte & Notare</td><td>Mandantengeheimnis</td></tr>
+      <tr><td>💼 Unternehmer</td><td>Geschäftsgeheimnisse</td></tr>
+      <tr><td>👨‍👩‍👧 Familien</td><td>Privatsphäre</td></tr>
+      <tr><td>🏳️‍🌈 Aktivisten</td><td>Schutz vor Überwachung</td></tr>
+      <tr><td>🩺 Mediziner</td><td>DSGVO-Patientendaten</td></tr>
+      <tr><td>🔬 Forscher</td><td>Vertrauliche Kollaboration</td></tr>
+    </table>
+    <div class="info"><strong>Klarstellung:</strong> ONYX VAULT ist kein Werkzeug für illegale Aktivitäten. Unsere Nutzer wollen Privatsphäre — nichts weiter.</div>
+  </div>
+
+  <div class="card">
+    <h2>Technische Spezifikationen</h2>
+    <table class="spec-table">
+      <tr><td>Plattform</td><td>Android 8.0+</td></tr>
+      <tr><td>Verschlüsselung</td><td>Kyber-1024 + X25519</td></tr>
+      <tr><td>Nachrichten</td><td>ChaCha20-Poly1305</td></tr>
+      <tr><td>Storage</td><td>SQLCipher + TEE</td></tr>
+      <tr><td>Schlüssel-Ableitung</td><td>Argon2id (256 MB)</td></tr>
+      <tr><td>Netzwerk</td><td>Tor + obfs4 + Nostr-wss</td></tr>
+      <tr><td>Hardware-Keystore</td><td>Knox/Titan/StrongBox</td></tr>
+      <tr><td>Server</td><td>Keine</td></tr>
+      <tr><td>Metadaten</td><td>Keine gespeichert</td></tr>
+      <tr><td>Open Source</td><td>Ja — SHA-256 Builds</td></tr>
+    </table>
+  </div>
+
+  <footer>
+    <div class="foot-logo"><span class="onyx">ONYX</span> <span class="vault">VAULT</span></div>
+    <div>
+      <a href="index.html" class="foot-link">Übersicht</a> ·
+      <a href="register.html" class="foot-link">Registrierung</a> ·
+      <a href="recovery.html" class="foot-link">Recovery</a> ·
+      <a href="killswitch.html" class="foot-link">Kill Switch</a>
+    </div>
+    <div class="copyright">
+      © 2026 ONYX VAULT v3.0 · Open Source<br>
+      Dezentral · Verschlüsselt · Privat
+    </div>
+  </footer>
+</div>
+</body>
+</html>

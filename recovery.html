@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Recovery — ONYX VAULT</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+<script src="https://unpkg.com/nostr-tools@1.17.0/lib/nostr.bundle.js"></script>
+<script src="hermes.js"></script>
+</head>
+<body>
+<div class="container">
+  <header>
+    <img src="logo.png" alt="ONYX VAULT" class="logo-img">
+    <div class="logo"><span class="onyx">ONYX</span> <span class="vault">VAULT</span></div>
+    <div class="tagline">Recovery — App-Zugang wiederherstellen</div>
+  </header>
+
+  <nav>
+    <a href="index.html">Übersicht</a>
+    <a href="register.html">Registrierung</a>
+    <a href="recovery.html" class="active">Recovery</a>
+    <a href="killswitch.html">Kill Switch</a>
+  </nav>
+
+  <div class="hero">
+    <h1>App-Zugang wiederherstellen</h1>
+    <p>Passphrase vergessen oder zu viele PIN-Fehlversuche? Zwei Wege führen zum Entsperren — <strong>ohne Datenverlust</strong>:</p>
+    <p style="font-size:14px;opacity:0.9">
+      🔑 <strong>Weg A:</strong> 5-Wort-Passphrase (kostenlos, sofort) &nbsp;·&nbsp;
+      📁 <strong>Weg B:</strong> Recovery-QR + Zahlung (bis 24h)
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="warn">
+      <strong>⚠️ Voraussetzung:</strong> Du musst zuvor <strong>kostenlos registriert</strong> sein (siehe <a href="register.html" style="color:var(--teal)">Registrierung</a>). Ohne Recovery-QR oder gespeicherte 5-Wort-Passphrase gibt es keinen Weg zurück.
+    </div>
+  </div>
+
+  <!-- ============ WEG A: 5-Wort-Passphrase ============ -->
+  <div class="card">
+    <h2>🔑 Weg A — 5-Wort-Passphrase (kostenlos & sofort)</h2>
+    <p>Gib deine 5 BIP-39 Wörter ein (nicht Klein-/Großschreibung-empfindlich). Der Hash wird lokal berechnet und signiert über das Nostr-Relay-Netzwerk an dein Handy gesendet. Dein Handy prüft gegen seinen Hardware-Keystore-Hash und entsperrt sich bei Match.</p>
+    <div class="phrase-grid">
+      <input type="text" class="phrase-input" id="w1" placeholder="Wort 1" autocomplete="off" spellcheck="false">
+      <input type="text" class="phrase-input" id="w2" placeholder="Wort 2" autocomplete="off" spellcheck="false">
+      <input type="text" class="phrase-input" id="w3" placeholder="Wort 3" autocomplete="off" spellcheck="false">
+      <input type="text" class="phrase-input" id="w4" placeholder="Wort 4" autocomplete="off" spellcheck="false">
+      <input type="text" class="phrase-input" id="w5" placeholder="Wort 5" autocomplete="off" spellcheck="false">
+    </div>
+    <button class="btn" style="width:100%" onclick="unlockWithPassphrase()">🔓 Mit Passphrase entsperren</button>
+    <div id="phraseStatus" style="margin-top:14px;text-align:center;font-family:monospace;font-size:13px"></div>
+    <div class="info" style="margin-top:16px;font-size:12px">
+      <strong>Sicherheit:</strong> Die Passphrase wird <strong>niemals</strong> übertragen oder gespeichert. Nur ein nicht-umkehrbarer SHA-256-Hash wird signiert versendet. 5 Fehlversuche in Folge → dein Handy führt automatisch eine forensische Löschung aus.
+    </div>
+  </div>
+
+  <!-- ============ WEG B: Recovery-QR + Payment ============ -->
+  <div class="card">
+    <h2>📁 Weg B — Recovery-QR + Zahlung</h2>
+    <p>Du hast deine 5-Wort-Passphrase vergessen? Lade deinen Recovery-QR hoch (den du bei der Registrierung erzeugt hast). Nach Zahlungseingang wird ein signierter Recovery-Befehl über die Nostr-Relays verteilt.</p>
+    <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+      <div class="upload-icon">📁</div>
+      <div><strong>Hier klicken oder Recovery-QR reinziehen</strong></div>
+      <div style="opacity:0.7;font-size:13px;margin-top:8px">PNG, JPG oder .zip Container</div>
+      <input type="file" id="fileInput" accept=".zip,.png,.jpg,.jpeg">
+    </div>
+    <div id="uploadStatus" style="margin-top:14px;text-align:center;font-family:monospace;font-size:13px"></div>
+  </div>
+
+  <div id="actionSection" class="card" style="display:none;border:1px solid var(--teal)">
+    <h2 style="color:var(--teal);border:none">✅ Tresor identifiziert</h2>
+    <p>App-ID: <strong id="displayAppId"></strong></p>
+    <p>Status: Bereit für Recovery-Befehl. Wähle unten eine Zahlungsmethode (Launch-Angebot für die ersten 1.000 Kunden kostenlos).</p>
+  </div>
+
+  <div class="card">
+    <h2>So funktioniert Recovery via QR</h2>
+    <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Recovery-QR hochladen</strong><br>Deine Identität wird lokal im Browser entschlüsselt (Argon2id + optional 5-Wort-Passphrase).</div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-text"><strong>App-ID extrahieren</strong><br>Nostr-Pubkey und App-ID werden aus dem QR-Code extrahiert. Private Keys bleiben nur im RAM.</div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Zahlung durchführen</strong><br>Wähle eine Zahlungsmethode. Die Zahlung dient als Anti-Spam-Schutz und Infrastruktur-Kostendeckung.</div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-text"><strong>Signierter Recovery-Befehl übers Nostr-Netzwerk</strong><br>Nach Zahlungseingang wird ein kryptografisch signiertes Event (NIP-01, Kind 30081) an alle Nostr-Relays verteilt. Weder wir noch die Relays kennen deinen App-Inhalt.</div></div>
+    <div class="step"><div class="step-num">5</div><div class="step-text"><strong>Handy empfängt und entsperrt (bis 24h)</strong><br>Sobald dein Handy online geht, holt die App den Befehl von einem Nostr-Relay, prüft die Signatur gegen deinen Hardware-Keystore und entsperrt sich. Alte Daten bleiben erhalten.</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Was bleibt — was wird ersetzt?</h2>
+    <table>
+      <tr><td>💬 Chat-Verläufe</td><td>Bleiben alle</td></tr>
+      <tr><td>👥 Kontaktliste</td><td>Bleibt komplett</td></tr>
+      <tr><td>🧅 Deine Onion-Adresse</td><td>Bleibt</td></tr>
+      <tr><td>📱 App-Settings</td><td>Bleiben</td></tr>
+      <tr><td>🔑 Alte Passphrase</td><td>Wird ersetzt</td></tr>
+      <tr><td>⏱️ PIN-Fehler-Counter</td><td>Zurückgesetzt</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="info">
+      <strong>Warum kostet Weg B Geld?</strong><br><br>
+      Ohne Kostenschwelle könnten Angreifer massenhaft Fake-Recovery-Commands über die öffentlichen Nostr-Relays schicken. Die Gebühr finanziert Monitoring unserer offiziell gelisteten Relays und schützt dein Handy vor Spam-Angriffen.<br><br>
+      <strong>Kostenlos:</strong> Weg A (5-Wort-Passphrase) ist jederzeit frei.<br><br>
+      <strong>🎉 Launch-Angebot:</strong> Für die ersten 1.000 Kunden ist auch Weg B kostenlos!
+    </div>
+  </div>
+
+  <div class="price-section">
+    <div style="font-family:monospace;font-size:13px;opacity:0.8;letter-spacing:2px">RECOVERY-GEBÜHR (WEG B)</div>
+    <div class="price">49,00 €</div>
+    <div style="font-size:13px;opacity:0.8">Launch-Angebot: Ersten 1.000 Kunden kostenlos</div>
+  </div>
+
+  <div class="card">
+    <h2>Zahlungsmethode wählen (nur für Weg B)</h2>
+    <div class="payment-grid">
+      <div class="payment" onclick="pay('paypal','49')"><div class="payment-icon">💳</div>PayPal<small>Käuferschutz</small></div>
+      <div class="payment" onclick="pay('klarna','49')"><div class="payment-icon">🅺</div>Klarna<small>Sofortüberweisung</small></div>
+      <div class="payment" onclick="pay('card','49')"><div class="payment-icon">💰</div>Kreditkarte<small>Visa/MasterCard</small></div>
+      <div class="payment" onclick="pay('sepa','49')"><div class="payment-icon">🏦</div>SEPA<small>EPC-QR-Code</small></div>
+      <div class="payment" onclick="pay('xmr','49')"><div class="payment-icon">🔒</div>Monero<small>100% anonym</small></div>
+      <div class="payment" onclick="pay('btc','49')"><div class="payment-icon">₿</div>Bitcoin<small>Lightning</small></div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="foot-logo"><span class="onyx">ONYX</span> <span class="vault">VAULT</span></div>
+    <div>
+      <a href="index.html" class="foot-link">Übersicht</a> ·
+      <a href="register.html" class="foot-link">Registrierung</a> ·
+      <a href="recovery.html" class="foot-link">Recovery</a> ·
+      <a href="killswitch.html" class="foot-link">Kill Switch</a>
+    </div>
+    <div class="copyright">© 2026 ONYX VAULT v3.0 · Dezentral · Verschlüsselt · Privat</div>
+  </footer>
+</div>
+
+<div class="modal-overlay" id="paymentModal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <h2 id="modalTitle">Zahlung</h2>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+const WALLETS = {
+  btc: {addr:'bc1qexampleonyxvaultbtcaddress000000000000', amount:'0.0008', coin:'BTC', amountEUR:'49'},
+  xmr: {addr:'48ExampleOnyxVaultMoneroAddressGoesHere0000000000000000000000000000000000000000000000000000000000', amount:'0.33', coin:'XMR', amountEUR:'49'},
+  eth: {addr:'0xExampleOnyxVaultEthereumAddress0000000000', amount:'0.015', coin:'ETH', amountEUR:'49'}
+};
+
+// ===== WEG A: 5-Wort-Passphrase =====
+async function unlockWithPassphrase() {
+  const words = ['w1','w2','w3','w4','w5'].map(id => document.getElementById(id).value.trim().toLowerCase()).filter(Boolean);
+  if (words.length !== 5) {
+    OnyxUI.status('phraseStatus', '❌ Bitte alle 5 Wörter ausfüllen', 'err');
+    return;
+  }
+  OnyxUI.status('phraseStatus', '⚙️ Signiere und sende an Nostr-Relays...');
+  const phrase = words.join(' ');
+  try {
+    const res = await Hermes.sendRecoveryWithPassphrase(phrase);
+    if (res.ok) {
+      OnyxUI.status('phraseStatus', '✅ Challenge gesendet an ' + res.relaysReached + '/' + res.relaysTotal + ' Relays — Hash: ' + res.hashSent, 'ok');
+      setTimeout(() => alert('✅ Passphrase-Challenge verteilt!\n\nSobald dein Handy online geht und einen passenden Hash-Match findet, entsperrt es sich automatisch.\n\nMaximal 24 Stunden Zustellzeit.'), 300);
+    } else {
+      OnyxUI.status('phraseStatus', '❌ ' + (res.error || 'Nostr-Fehler'), 'err');
+    }
+  } catch (e) {
+    OnyxUI.status('phraseStatus', '❌ ' + e.message, 'err');
+  }
+  // Clear inputs sofort
+  ['w1','w2','w3','w4','w5'].forEach(id => document.getElementById(id).value = '');
+}
+
+// ===== WEG B: Recovery-QR Upload =====
+document.addEventListener('DOMContentLoaded', () => {
+  const zone = document.getElementById('dropZone');
+  const input = document.getElementById('fileInput');
+  ['dragenter','dragover'].forEach(ev => zone.addEventListener(ev, e => { e.preventDefault(); zone.classList.add('drag-over'); }));
+  ['dragleave','drop'].forEach(ev => zone.addEventListener(ev, e => { e.preventDefault(); zone.classList.remove('drag-over'); }));
+  zone.addEventListener('drop', e => { e.preventDefault(); if (e.dataTransfer.files[0]) processQR(e.dataTransfer.files[0]); });
+  input.addEventListener('change', e => { if (e.target.files[0]) processQR(e.target.files[0]); });
+});
+
+async function processQR(file) {
+  OnyxUI.status('uploadStatus', '🔍 Analysiere QR-Code...');
+  try {
+    const img = await loadImage(file);
+    const canvas = document.createElement('canvas');
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+    const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const code = jsQR(data.data, data.width, data.height);
+    if (!code) {
+      OnyxUI.status('uploadStatus', '❌ Kein QR-Code im Bild gefunden', 'err');
+      return;
+    }
+    const ok = await Hermes.saveIdentity(code.data);
+    if (ok) {
+      OnyxUI.status('uploadStatus', '✅ Tresor identifiziert — bereit für Zahlung', 'ok');
+      document.getElementById('displayAppId').innerText = Hermes.getAppId();
+      document.getElementById('actionSection').style.display = 'block';
+      window.scrollTo({ top: document.getElementById('actionSection').offsetTop - 20, behavior: 'smooth' });
+    } else {
+      OnyxUI.status('uploadStatus', '❌ Ungültiger QR oder falsches Passwort', 'err');
+    }
+  } catch (e) {
+    OnyxUI.status('uploadStatus', '❌ ' + e.message, 'err');
+  }
+}
+
+function loadImage(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error('Bild konnte nicht geladen werden'));
+      img.src = reader.result;
+    };
+    reader.onerror = () => reject(new Error('Datei lesen fehlgeschlagen'));
+    reader.readAsDataURL(file);
+  });
+}
+
+// ===== PAYMENT MODAL =====
+function closeModal() { document.getElementById('paymentModal').classList.remove('active'); }
+
+function copyAddr(id) {
+  const el = document.getElementById(id);
+  navigator.clipboard.writeText(el.textContent.trim()).then(() => {
+    const btn = document.getElementById(id + '_btn');
+    btn.textContent = '✓ KOPIERT!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 Adresse kopieren'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function pay(method, amount) {
+  if (!Hermes.isReady()) {
+    alert('Bitte zuerst Recovery-QR hochladen (Weg B).');
+    return;
+  }
+  const modal = document.getElementById('paymentModal');
+  const title = document.getElementById('modalTitle');
+  const content = document.getElementById('modalContent');
+  const names = {paypal:'PayPal', klarna:'Klarna', card:'Kreditkarte', sepa:'SEPA', xmr:'Monero', btc:'Bitcoin'};
+  title.textContent = names[method] + ' — ' + amount + '€';
+
+  if (method === 'btc' || method === 'xmr' || method === 'eth') {
+    const w = WALLETS[method];
+    content.innerHTML =
+      '<div class="wallet-info">🎉 <strong>Launch-Angebot:</strong> Für die ersten 1.000 Kunden kostenlos! Klick unten um ohne Zahlung zu starten, oder sende die Summe an die Wallet.</div>'+
+      '<div class="wallet-section">'+
+        '<div class="wallet-coin">SENDE AN DIESE '+w.coin+'-ADRESSE</div>'+
+        '<div class="wallet-amount">'+w.amount+' '+w.coin+'</div>'+
+        '<div style="font-size:12px;opacity:0.7">≈ '+w.amountEUR+' €</div>'+
+        '<div class="wallet-qr">QR wird in Produktion generiert</div>'+
+        '<div class="wallet-addr" id="addr_'+method+'">'+w.addr+'</div>'+
+        '<button class="btn-copy" id="addr_'+method+'_btn" onclick="copyAddr(\'addr_'+method+'\')">📋 Adresse kopieren</button>'+
+      '</div>'+
+      '<button class="wallet-connect-btn" onclick="activateFreeMode()">🎉 Launch-Angebot nutzen (kostenlos)</button>'+
+      '<div style="text-align:center;margin-top:12px;font-size:12px;opacity:0.6">Zahlung wird automatisch erkannt sobald '+w.coin+'-TX bestätigt ist.</div>';
+  } else {
+    content.innerHTML =
+      '<div class="wallet-info">🎉 <strong>Launch-Angebot:</strong> Für die ersten 1.000 Kunden kostenlos!</div>'+
+      '<div class="wallet-section">'+
+        '<div class="wallet-coin">BEZAHLE MIT '+names[method].toUpperCase()+'</div>'+
+        '<div class="wallet-amount">'+amount+' €</div>'+
+        '<div style="font-size:13px;opacity:0.8;margin-top:16px">In Produktion öffnet sich hier dein '+names[method]+'-Zahlungsdialog.</div>'+
+      '</div>'+
+      '<button class="wallet-connect-btn" onclick="activateFreeMode()">🎉 Launch-Angebot nutzen (kostenlos)</button>';
+  }
+  modal.classList.add('active');
+}
+
+async function activateFreeMode() {
+  closeModal();
+  const res = await Hermes.sendRecoveryCommand(null);
+  if (res.ok) {
+    alert('✅ Recovery-Befehl gesendet an ' + res.relaysReached + '/' + res.relaysTotal + ' Nostr-Relays!\n\nEvent-ID: ' + res.eventId.substring(0,16) + '...\n\nSobald dein Handy online geht, entsperrt sich die App automatisch.\nMaximal 24h Zustellzeit.');
+  } else {
+    alert('❌ Nostr-Versand fehlgeschlagen: ' + (res.error || 'unbekannt'));
+  }
+}
+</script>
+</body>
+</html>
