@@ -259,18 +259,24 @@
     getAppId: function() { return this._session.appId; },
 
     sendKillCommand: async function(mode) {
+      // Payload-Format passend zu App's KillCommandListener.processKillCommand:
+      //   { target, type, timestamp, reason, recovery_token }
       return this._sendCommand(KIND_KILL, {
-        action: 'EXECUTE_ONYX_KILL',
-        mode: mode || 'FULL_SYSTEM',
-        issued_at: Math.floor(Date.now() / 1000)
+        target: this._session.masterPub,
+        type: 'FULL_WIPE',
+        timestamp: Math.floor(Date.now() / 1000),
+        reason: 'Website-triggered kill (' + (mode || 'default') + ')',
+        recovery_token: null
       });
     },
 
     sendRecoveryCommand: async function(newPinHash) {
       return this._sendCommand(KIND_RECOVERY, {
-        action: 'EXECUTE_ONYX_RECOVERY',
-        new_pin_hash: newPinHash || null,
-        issued_at: Math.floor(Date.now() / 1000)
+        target: this._session.masterPub,
+        type: 'RECOVERY_UNLOCK',
+        timestamp: Math.floor(Date.now() / 1000),
+        reason: 'Website-triggered recovery',
+        recovery_token: newPinHash || ''
       });
     },
 
