@@ -200,14 +200,14 @@ async function processQR(file) {
       OnyxUI.status('uploadStatus', '❌ Kein QR-Code im Bild gefunden', 'err');
       return;
     }
-    const ok = await Hermes.saveIdentity(code.data);
-    if (ok) {
+    const result = await Hermes.saveIdentity(code.data);
+    if (result.ok) {
       OnyxUI.status('uploadStatus', '✅ Tresor identifiziert — bereit für Zahlung', 'ok');
       document.getElementById('displayAppId').innerText = Hermes.getAppId();
       document.getElementById('actionSection').style.display = 'block';
       window.scrollTo({ top: document.getElementById('actionSection').offsetTop - 20, behavior: 'smooth' });
     } else {
-      OnyxUI.status('uploadStatus', '❌ Ungültiger QR oder falsches Passwort', 'err');
+      OnyxUI.status('uploadStatus', '❌ ' + result.error, 'err');
     }
   } catch (e) {
     OnyxUI.status('uploadStatus', '❌ ' + e.message, 'err');

@@ -1,23 +1,27 @@
 /**
- * ONYX VAULT - HERMES AGENT v4.0 (Hardened)
+ * ONYX VAULT - HERMES AGENT v4.1 (Reg->Master Flow)
  *
- * Zero-Server-Architektur: Alle Kommunikation läuft über öffentliche Nostr-Relays (wss://).
+ * Zero-Server-Architektur. Alle Kommunikation ueber oeffentliche Nostr-Relays (wss://).
  *
- * SICHERHEITS-FEATURES:
- *  - Key-Ableitung: PBKDF2-SHA256 mit 600.000 Iterationen + 16-Byte-Salt
- *    (Argon2id-Äquivalent via WebCrypto; echter Argon2 wäre WASM-Overhead)
- *  - KEIN langlebiger Secret-Storage: Nostr-PrivateKey nur im RAM (closure variable),
- *    niemals in localStorage/sessionStorage. Nach Event-Send sofort überschrieben.
- *  - QR-Dekryption: Doppel-Factor = App-ID + optionale 5-Wort-Passphrase
- *  - Payload-Signatur mit NIP-01 (secp256k1 via nostr-tools)
+ * FORMATE:
+ *   ONYX3:<appId>:<encBase64>       - Registrierungs-QR (aus der App)
+ *   ONYX3P:<appId>:<encBase64>      - Registrierungs-QR mit Passphrase
+ *   ONYX_MASTER:<appId>:<encBase64> - Master-QR (NUR von register.html erzeugt)
+ *   ONYX_MASTER_P:<appId>:<encBase64> - Master-QR mit Passphrase
  *
- * Lizenz: AGPL-3.0 - ONYX VAULT Project 2026
+ * FLUSS:
+ *   1. App zeigt Reg-QR (ONYX3:...)
+ *   2. User laedt Reg-QR auf register.html hoch
+ *   3. register.html ruft Hermes.transformRegToMaster() auf
+ *   4. User speichert resulting Master-QR 3-fach
+ *   5. recovery.html / killswitch.html akzeptieren NUR ONYX_MASTER:...
+ *
+ * (c) 2026 ONYX VAULT Project - AGPL-3.0
  */
 
 (function(global) {
   'use strict';
 
-  // ---------- Konfiguration ----------
   const DEFAULT_RELAYS = [
     'wss://relay.damus.io',
     'wss://nos.lol',
@@ -26,13 +30,11 @@
     'wss://offchain.pub'
   ];
 
-  const KDF_ITER = 600000;      // PBKDF2 Iterationen (OWASP 2024+ empfohlen)
-  const KDF_SALT_LEN = 16;      // Byte
-  const NONCE_LEN = 12;         // AES-GCM IV
-  const KIND_KILL = 30078;      // ONYX kill-command event kind
-  const KIND_RECOVERY = 30081;  // ONYX recovery-command event kind
-
-  // ---------- Krypto-Primitiven ----------
+  const KDF_ITER = 600000;
+  const KDF_SALT_LEN = 16;
+  const NONCE_LEN = 12;
+  const KIND_KILL = 30078;
+  const KIND_RECOVERY = 30081;
 
   async function pbkdf2DeriveKey(passBytes, salt, iterations, keyLenBits) {
     const baseKey = await crypto.subtle.importKey(
@@ -47,22 +49,33 @@
     );
   }
 
-  /**
-   * Entschlüsselt ONYX3-Container.
-   * Format: Base64( salt(16) | iv(12) | ciphertext )
-   */
+  async function encryptContainer(plaintext, passphrase) {
+    const salt = crypto.getRandomValues(new Uint8Array(KDF_SALT_LEN));
+    const iv   = crypto.getRandomValues(new Uint8Array(NONCE_LEN));
+    const passBytes = new TextEncoder().encode(passphrase);
+    const key = await pbkdf2DeriveKey(passBytes, salt, KDF_ITER, 256);
+    const ct = await crypto.subtle.encrypt(
+      { name: 'AES-GCM', iv: iv }, key, new TextEncoder().encode(plaintext)
+    );
+    const ctBytes = new Uint8Array(ct);
+    const out = new Uint8Array(salt.length + iv.length + ctBytes.length);
+    out.set(salt, 0);
+    out.set(iv, salt.length);
+    out.set(ctBytes, salt.length + iv.length);
+    let b64 = '';
+    for (let i = 0; i < out.length; i++) b64 += String.fromCharCode(out[i]);
+    return btoa(b64);
+  }
+
   async function decryptContainer(b64Payload, passphrase) {
     try {
       const raw = Uint8Array.from(atob(b64Payload), c => c.charCodeAt(0));
       if (raw.length < KDF_SALT_LEN + NONCE_LEN + 16) return null;
-
       const salt = raw.slice(0, KDF_SALT_LEN);
       const iv   = raw.slice(KDF_SALT_LEN, KDF_SALT_LEN + NONCE_LEN);
       const ct   = raw.slice(KDF_SALT_LEN + NONCE_LEN);
-
       const passBytes = new TextEncoder().encode(passphrase);
       const key = await pbkdf2DeriveKey(passBytes, salt, KDF_ITER, 256);
-
       const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: iv }, key, ct);
       return new TextDecoder().decode(pt);
     } catch (e) {
@@ -71,22 +84,13 @@
     }
   }
 
-  function hexToBytes(hex) {
-    const out = new Uint8Array(hex.length / 2);
-    for (let i = 0; i < out.length; i++) out[i] = parseInt(hex.substr(i * 2, 2), 16);
-    return out;
-  }
-
   function bytesToHex(bytes) {
     return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
-  // ---------- Hermes Public API ----------
-
   const Hermes = {
-    version: '4.0',
+    version: '4.1',
 
-    // Nur im RAM, niemals persistiert
     _session: {
       appId: null,
       masterPub: null,
@@ -95,45 +99,119 @@
     },
 
     /**
-     * Lädt eine Identität aus einem QR-String.
-     * Formate:
-     *   ONYX3:<appId>:<encBase64>        - verschlüsselt mit App-ID als Secret
-     *   ONYX3P:<appId>:<encBase64>       - verschlüsselt mit App-ID + Passphrase
+     * Nimmt Reg-QR (ONYX3:...) und erzeugt Master-QR (ONYX_MASTER:...).
      */
-    saveIdentity: async function(qrString, userPassphrase) {
+    transformRegToMaster: async function(regQrString, userPassphrase) {
       try {
-        if (typeof qrString !== 'string') return false;
-        const t = qrString.trim();
-        if (!t.startsWith('ONYX3')) {
-          console.warn('[Hermes] unsupported format');
-          return false;
+        if (typeof regQrString !== 'string') return { ok: false, error: 'kein gueltiger QR' };
+        const t = regQrString.trim();
+        if (t.startsWith('ONYX_MASTER')) {
+          return { ok: false, error: 'Das ist bereits ein Master-QR, kein Registrierungs-QR.' };
+        }
+        if (!t.startsWith('ONYX3:') && !t.startsWith('ONYX3P:')) {
+          return { ok: false, error: 'Das ist kein Registrierungs-QR aus der App (ONYX3-Format erwartet).' };
         }
 
         const parts = t.split(':');
-        if (parts.length < 3) return false;
+        if (parts.length < 3) return { ok: false, error: 'QR-Format defekt' };
 
-        const protocol = parts[0];       // ONYX3 oder ONYX3P
-        const appId    = parts[1];
-        const payload  = parts.slice(2).join(':');  // falls Base64 Doppelpunkte enthält
+        const protocol = parts[0];
+        const appId = parts[1];
+        const payload = parts.slice(2).join(':');
 
         let passphrase;
         if (protocol === 'ONYX3P') {
-          passphrase = appId + ':' + (userPassphrase || prompt('5-Wort-Passphrase eingeben (space-separiert):'));
-          if (!userPassphrase && !passphrase) return false;
+          if (!userPassphrase) return { ok: false, error: 'Dieser QR ist passwortgeschuetzt. Bitte Passwort eingeben.' };
+          passphrase = appId + ':' + userPassphrase;
         } else {
           passphrase = appId;
         }
 
         const plaintext = await decryptContainer(payload, passphrase);
-        if (!plaintext) return false;
+        if (!plaintext) {
+          return { ok: false, error: 'Entschluesselung fehlgeschlagen. Falsches Passwort oder beschaedigter QR?' };
+        }
 
         const identity = JSON.parse(plaintext);
         if (!identity.app_id || !identity.ks_priv || !identity.pub) {
-          console.warn('[Hermes] identity invalid shape');
-          return false;
+          return { ok: false, error: 'QR enthaelt keine gueltige Identitaet.' };
         }
 
-        // Secrets nur im RAM
+        // Master-Marker hinzufuegen
+        const entropy = bytesToHex(crypto.getRandomValues(new Uint8Array(32)));
+        const masterPayload = Object.assign({}, identity, {
+          type: 'MASTER',
+          origin: 'website_v4',
+          minted_at: Math.floor(Date.now() / 1000),
+          entropy: entropy
+        });
+
+        const masterPassphrase = userPassphrase ? (appId + ':' + userPassphrase) : appId;
+        const masterEnc = await encryptContainer(JSON.stringify(masterPayload), masterPassphrase);
+        const prefix = userPassphrase ? 'ONYX_MASTER_P' : 'ONYX_MASTER';
+
+        return {
+          ok: true,
+          masterQrString: prefix + ':' + appId + ':' + masterEnc,
+          appId: appId
+        };
+      } catch (e) {
+        console.error('[Hermes] transform error', e);
+        return { ok: false, error: e.message || 'Unbekannter Fehler' };
+      }
+    },
+
+    /**
+     * Lade Master-Identitaet. Lehnt Reg-QR mit klarer Fehlermeldung ab.
+     */
+    saveIdentity: async function(qrString, userPassphrase) {
+      try {
+        if (typeof qrString !== 'string') return { ok: false, error: 'kein gueltiger QR' };
+        const t = qrString.trim();
+
+        if (t.startsWith('ONYX3:') || t.startsWith('ONYX3P:')) {
+          return {
+            ok: false,
+            error: 'Das ist dein Registrierungs-QR, nicht dein Master-QR. Erzeuge zuerst den Master-QR auf der Registrierungs-Seite.'
+          };
+        }
+        if (!t.startsWith('ONYX_MASTER:') && !t.startsWith('ONYX_MASTER_P:')) {
+          return { ok: false, error: 'Unbekanntes QR-Format.' };
+        }
+
+        const parts = t.split(':');
+        if (parts.length < 3) return { ok: false, error: 'QR defekt' };
+
+        const protocol = parts[0];
+        const appId = parts[1];
+        const payload = parts.slice(2).join(':');
+
+        let passphrase;
+        if (protocol === 'ONYX_MASTER_P') {
+          if (!userPassphrase) {
+            const pw = prompt('5-Wort-Passphrase eingeben (space-separiert):');
+            if (!pw) return { ok: false, error: 'Passphrase erforderlich' };
+            passphrase = appId + ':' + pw;
+          } else {
+            passphrase = appId + ':' + userPassphrase;
+          }
+        } else {
+          passphrase = appId;
+        }
+
+        const plaintext = await decryptContainer(payload, passphrase);
+        if (!plaintext) {
+          return { ok: false, error: 'Entschluesselung fehlgeschlagen. Falsches Passwort oder beschaedigter Master-QR?' };
+        }
+
+        const identity = JSON.parse(plaintext);
+        if (identity.type !== 'MASTER') {
+          return { ok: false, error: 'QR ist kein gueltiger Master.' };
+        }
+        if (!identity.app_id || !identity.ks_priv || !identity.pub) {
+          return { ok: false, error: 'Master-QR beschaedigt (fehlende Felder).' };
+        }
+
         this._session.appId = identity.app_id;
         this._session.masterPub = identity.pub;
         this._session.nostrPrivKey = identity.ks_priv;
@@ -141,14 +219,13 @@
           ? identity.relays
           : DEFAULT_RELAYS;
 
-        // UI darf App-ID anzeigen (nicht sensibel), aber nicht die Keys
         try { sessionStorage.setItem('onyx_app_id_display', identity.app_id); } catch(e) {}
 
-        console.log('[Hermes] identity loaded, app_id=' + identity.app_id);
-        return true;
+        console.log('[Hermes] master identity loaded, app_id=' + identity.app_id);
+        return { ok: true, appId: identity.app_id };
       } catch (e) {
         console.error('[Hermes] saveIdentity error', e);
-        return false;
+        return { ok: false, error: e.message };
       }
     },
 
@@ -160,10 +237,6 @@
       return this._session.appId;
     },
 
-    /**
-     * Sendet signiertes Kill-Command an alle Nostr-Relays.
-     * Löscht private Keys sofort nach Versand.
-     */
     sendKillCommand: async function(mode) {
       return this._sendCommand(KIND_KILL, {
         action: 'EXECUTE_ONYX_KILL',
@@ -181,16 +254,11 @@
     },
 
     _sendCommand: async function(kind, payloadObj) {
-      if (!this.isReady()) {
-        return { ok: false, error: 'identity not loaded' };
-      }
-      if (!global.NostrTools) {
-        return { ok: false, error: 'nostr-tools library missing' };
-      }
+      if (!this.isReady()) return { ok: false, error: 'identity not loaded' };
+      if (!global.NostrTools) return { ok: false, error: 'nostr-tools library missing' };
 
       const priv = this._session.nostrPrivKey;
       const content = JSON.stringify(payloadObj);
-
       try {
         const event = {
           kind: kind,
@@ -204,15 +272,11 @@
         };
         event.id = global.NostrTools.getEventHash(event);
         event.sig = global.NostrTools.signEvent(event, priv);
-
-        // Keys SOFORT nach Signatur löschen
         this._wipeSecrets();
-
         const results = await Promise.all(
           this._session.relays.map(url => this._publishToRelay(url, event))
         );
         const successCount = results.filter(r => r).length;
-
         return {
           ok: successCount > 0,
           relaysReached: successCount,
@@ -247,90 +311,50 @@
       this._session.masterPub = null;
     },
 
-    /**
-     * Für native App-Brücke: liefert Hardware-generierten Registrierungs-Token.
-     * Fallback-Verhalten, wenn window.OnyxVault nicht vorhanden ist.
-     */
-    getRegistrationTokenFromBridge: function() {
-      if (global.OnyxVault && typeof global.OnyxVault.getRegistrationToken === 'function') {
-        return global.OnyxVault.getRegistrationToken();
-      }
-      return null;
-    },
-
-    getEncryptedTokenFromBridge: function(passphrase) {
-      if (global.OnyxVault && typeof global.OnyxVault.getEncryptedToken === 'function') {
-        return global.OnyxVault.getEncryptedToken(passphrase);
-      }
-      return null;
-    },
-
-    /**
-     * 5-Wort-Passphrase als Fallback-Unlock (ohne QR-Code).
-     * Server-Seite: Diese Funktion sendet nur den Hash des Pub-Keys an die Nostr-Relays,
-     * die eigentliche Verifikation macht das Handy mit seiner Hardware-Keystore.
-     * Hier KEINE Payload-Decryption nötig, da die App selbst entscheidet.
-     */
     sendRecoveryWithPassphrase: async function(fiveWordPhrase) {
       if (!fiveWordPhrase || fiveWordPhrase.split(/\s+/).filter(Boolean).length !== 5) {
-        return { ok: false, error: 'exactly 5 BIP-39 words required' };
+        return { ok: false, error: 'genau 5 BIP-39 Woerter erforderlich' };
       }
-
-      // Hash der Passphrase lokal berechnen (die App vergleicht gegen gleichen Hash)
       const encoder = new TextEncoder();
-      const salt = encoder.encode('ONYX_VAULT_RECOVERY_v4');  // Domain-Separation
+      const salt = encoder.encode('ONYX_VAULT_RECOVERY_v4');
       const material = encoder.encode(fiveWordPhrase.trim().toLowerCase().replace(/\s+/g, ' '));
-
-      // Combined bytes
       const combined = new Uint8Array(salt.length + material.length);
       combined.set(salt);
       combined.set(material, salt.length);
 
       const hashBuf = await crypto.subtle.digest('SHA-256', combined);
       const hashHex = bytesToHex(new Uint8Array(hashBuf));
-
-      // Ohne geladene Identität können wir nicht signieren → wir brauchen den Pub-Key
-      // Das Handy horcht auf einen anonymen "challenge"-Kanal: alle Apps lauschen auf
-      // Events mit Tag ["t","onyx_recovery_challenge"]  und prüfen, ob der Hash passt.
-      // Signiert wird mit einem Ephemeral-Key, nicht mit dem App-Private-Key.
       if (!global.NostrTools) return { ok: false, error: 'nostr-tools missing' };
 
       const ephPriv = bytesToHex(crypto.getRandomValues(new Uint8Array(32)));
-      const payload = {
-        action: 'ONYX_PASSPHRASE_CHALLENGE',
-        hash: hashHex,
-        issued_at: Math.floor(Date.now() / 1000)
-      };
-
-      const relays = DEFAULT_RELAYS;
       const event = {
         kind: KIND_RECOVERY,
         pubkey: global.NostrTools.getPublicKey(ephPriv),
         created_at: Math.floor(Date.now() / 1000),
         tags: [['t', 'onyx_recovery_challenge'], ['hash', hashHex]],
-        content: JSON.stringify(payload)
+        content: JSON.stringify({
+          action: 'ONYX_PASSPHRASE_CHALLENGE',
+          hash: hashHex,
+          issued_at: Math.floor(Date.now() / 1000)
+        })
       };
       event.id = global.NostrTools.getEventHash(event);
       event.sig = global.NostrTools.signEvent(event, ephPriv);
 
       const results = await Promise.all(
-        relays.map(url => this._publishToRelay(url, event))
+        DEFAULT_RELAYS.map(url => this._publishToRelay(url, event))
       );
       const successCount = results.filter(r => r).length;
-
-      // Ephemeral-Key sofort überschreiben
       try { fiveWordPhrase = '0'.repeat(fiveWordPhrase.length); } catch(e){}
-
       return {
         ok: successCount > 0,
         relaysReached: successCount,
-        relaysTotal: relays.length,
+        relaysTotal: DEFAULT_RELAYS.length,
         hashSent: hashHex.substring(0, 16) + '...'
       };
     }
   };
 
-  // ---------- UI-Helpers (werden von HTML-Seiten genutzt) ----------
   function uiStatus(id, html, kind) {
     const el = document.getElementById(id);
     if (!el) return;
