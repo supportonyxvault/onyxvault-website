@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Registrierung — ONYX VAULT</title>
 <link rel="stylesheet" href="style.css">
-<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="jsQR.min.js"></script>
+<script src="qrcode.min.js"></script>
 <script src="hermes.js"></script>
 </head>
 <body>
@@ -79,7 +79,7 @@
       1️⃣ Verschlüsselter Cloud-Speicher (siehe unten)<br>
       2️⃣ Papier-Ausdruck im Safe<br>
       3️⃣ Bei vertrauensvoller Person<br><br>
-      <strong>Wichtig:</strong> Zusätzlich notiere dir deine <strong>5-Wort-Passphrase</strong> aus der App. Mit ihr kannst du dein Handy auch ohne Master-QR entsperren (siehe Recovery-Seite).
+      <strong>Tipp:</strong> Falls du beim Erzeugen in der App ein Cloud-Passwort gesetzt hast, merke dir dieses — ohne das Passwort kann der Master-QR nicht entschlüsselt werden.
     </div>
   </div>
 
@@ -191,15 +191,45 @@ function renderResult(result) {
   document.getElementById('masterSection').style.display = 'block';
   document.getElementById('displayAppId').innerText = result.appId;
   const canvas = document.getElementById('masterQrCanvas');
-  QRCode.toCanvas(canvas, result.masterQrString, { width: 320, margin: 2, color: {dark:'#000000', light:'#ffffff'} }, (err) => {
-    if (err) {
-      console.error(err);
-      alert('QR-Rendering fehlgeschlagen: ' + err.message);
-      return;
-    }
-    document.getElementById('downloadLink').href = canvas.toDataURL('image/png');
-    document.getElementById('masterSection').scrollIntoView({ behavior: 'smooth' });
-  });
+  // davidshimjs/qrcodejs API: haengt in einen Container, nutzt dann img oder canvas intern
+  const container = canvas.parentElement;
+  // Alte QRCode-Instanz entfernen falls vorhanden
+  if (window._lastQR) { window._lastQR.clear(); window._lastQR = null; }
+  // QRCode braucht ein DIV als Container - wir bauen eins um das canvas
+  let holder = document.getElementById('qrHolder');
+  if (!holder) {
+    holder = document.createElement('div');
+    holder.id = 'qrHolder';
+    holder.style.cssText = 'background:white;padding:16px;border-radius:12px;margin:16px auto;display:inline-block';
+    canvas.parentNode.insertBefore(holder, canvas);
+    canvas.style.display = 'none';
+  }
+  holder.innerHTML = '';
+  try {
+    window._lastQR = new QRCode(holder, {
+      text: result.masterQrString,
+      width: 288,
+      height: 288,
+      colorDark: '#000000',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+    // Download-Link ueber die generierte Canvas/IMG setzen
+    setTimeout(() => {
+      const genCanvas = holder.querySelector('canvas');
+      const genImg = holder.querySelector('img');
+      let dataUrl = null;
+      if (genCanvas) dataUrl = genCanvas.toDataURL('image/png');
+      else if (genImg) dataUrl = genImg.src;
+      if (dataUrl) {
+        document.getElementById('downloadLink').href = dataUrl;
+      }
+      document.getElementById('masterSection').scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  } catch (e) {
+    console.error('QR-render error:', e);
+    alert('QR-Rendering fehlgeschlagen: ' + e.message);
+  }
   // Pending-Data löschen (RAM)
   pendingQrData = null;
   document.getElementById('userPassphrase').value = '';
