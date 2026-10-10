@@ -26,7 +26,7 @@
 
   <div class="hero">
     <h1>App-Registrierungs-QR in Master-QR umwandeln</h1>
-    <p>Lade deinen <strong>App-Registrierungs-QR</strong> hier hoch (den du in der App unter „Mein App-Reg-Code" findest). Die Website entschlüsselt ihn lokal in deinem Browser und erzeugt daraus deinen <strong>finalen Master-QR</strong>. Diesen brauchst du für Recovery und Kill Switch.</p>
+    <p>Lade deinen <strong>App-Registrierungs-QR</strong> hier hoch (den du in der App unter „Mein App-Reg-Code" findest). Die Website entschlüsselt ihn lokal in deinem Browser und erzeugt daraus deinen <strong>finalen Master-QR</strong>.</p>
     <span class="badge">0 EUR</span>
     <span class="badge">OHNE EMAIL</span>
     <span class="badge">ZERO-SERVER</span>
@@ -63,19 +63,22 @@
     <p><strong>App-ID:</strong> <code id="displayAppId"></code></p>
     <p style="font-size:13px;opacity:0.85;margin:12px 0">
       Dies ist dein finaler Master-QR. Lade ihn herunter und sichere ihn an mindestens 3 sicheren Orten.
-      Du brauchst ihn für Recovery UND Kill Switch — <strong>der App-Reg-QR allein reicht nicht!</strong>
+      <strong>Der App-Reg-QR allein reicht nicht für Recovery/Kill Switch!</strong>
     </p>
     <div style="text-align:center">
-      <div id="qrHolder" style="background:white;padding:14px;border-radius:12px;margin:16px auto;display:inline-block;max-width:95%"></div>
+      <canvas id="masterCanvas" style="background:white;padding:14px;border-radius:12px;margin:16px auto;display:block;max-width:95%;height:auto"></canvas>
       <br>
-      <a id="downloadLink" class="btn" style="background:var(--teal);color:var(--bg);margin-top:8px" download="ONYX_VAULT_MASTER.png">📥 Master-QR als PNG herunterladen</a>
+      <button class="btn" style="background:var(--teal);color:var(--bg);border:none;cursor:pointer;font-family:inherit" onclick="downloadMasterQR()">
+        📥 MASTER-QR SPEICHERN
+      </button>
+      <div id="dlStatus" style="margin-top:10px;font-family:monospace;font-size:12px"></div>
     </div>
     <div class="warn" style="margin-top:16px">
       <strong>Backup-Strategie — mindestens 3-fach sichern:</strong><br>
       1️⃣ Verschlüsselter Cloud-Speicher (siehe unten)<br>
       2️⃣ Papier-Ausdruck im Safe<br>
       3️⃣ Bei vertrauensvoller Person<br><br>
-      <strong>Ohne diesen Master-QR gibt es keinen Weg zurück, wenn du deine App-PIN vergisst und das Handy verlierst.</strong>
+      <strong>Ohne diesen Master-QR gibt es keinen Weg zurück, wenn du PIN vergisst und das Handy verlierst.</strong>
     </div>
   </div>
 
@@ -112,14 +115,13 @@
       <a href="recovery.html" class="foot-link">Recovery</a> ·
       <a href="killswitch.html" class="foot-link">Kill Switch</a>
     </div>
-    <div class="copyright">
-      © 2026 ONYX VAULT v3.0 · Open Source<br>
-      Dezentral · Verschlüsselt · Privat
-    </div>
+    <div class="copyright">© 2026 ONYX VAULT v3.0 · Dezentral · Verschlüsselt · Privat</div>
   </footer>
 </div>
 
 <script>
+'use strict';
+
 document.addEventListener('DOMContentLoaded', () => {
   const zone = document.getElementById('dropZone');
   const input = document.getElementById('fileInput');
@@ -161,59 +163,126 @@ function renderResult(result) {
   document.getElementById('masterSection').style.display = 'block';
   document.getElementById('displayAppId').innerText = result.appId;
 
-  // davidshimjs/qrcodejs: generiert <canvas> oder <img> im Container
-  const holder = document.getElementById('qrHolder');
-  holder.innerHTML = '';
-  const size = Math.min(240, Math.floor(window.innerWidth * 0.72));
+  // SYNCHRON Canvas-Rendering mit qrcode-generator Library (Kazuhiko Arase)
+  // Diese Lib hat KEIN async rendering - danach ist Canvas 100% fertig
   try {
-    new QRCode(holder, {
-      text: result.masterQrString,
-      width: size,
-      height: size,
-      colorDark: '#000000',
-      colorLight: '#ffffff',
-      correctLevel: QRCode.CorrectLevel.M
-    });
+    renderQRToCanvas(result.masterQrString, document.getElementById('masterCanvas'));
+    document.getElementById('dlStatus').innerText = 'QR fertig · ' + result.masterQrString.length + ' Zeichen';
   } catch (e) {
+    document.getElementById('dlStatus').innerText = '❌ Rendering-Fehler: ' + e.message;
     alert('QR-Rendering fehlgeschlagen: ' + e.message);
     return;
   }
 
-  // Download-Link setzen - robust: Mehrere Versuche mit Delays
-  const setDownloadLink = () => {
-    const cv = holder.querySelector('canvas');
-    const im = holder.querySelector('img');
-    let url = null;
-    if (cv) {
-      try { url = cv.toDataURL('image/png'); } catch (e) {}
+  document.getElementById('masterSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/**
+ * Synchron Canvas-Rendering mit qrcode-generator.
+ * Garantiert dass canvas.toDataURL() danach eine echte PNG liefert.
+ */
+function renderQRToCanvas(text, canvas) {
+  // Automatisch die kleinste type-number waehlen die den Text aufnimmt
+  let qr = null;
+  for (let typeNum = 4; typeNum <= 40; typeNum++) {
+    try {
+      qr = qrcode(typeNum, 'M');
+      qr.addData(text);
+      qr.make();
+      break;
+    } catch (e) {
+      qr = null;
+      if (typeNum === 40) throw e;
     }
-    if (!url && im) {
-      url = im.src;
+  }
+  if (!qr) throw new Error('QR konnte nicht erzeugt werden (text zu lang)');
+
+  const modules = qr.getModuleCount();
+  const cellSize = 6;         // 6 Pixel pro Modul = handliche Groesse
+  const margin = 4;           // 4 Module Rand (quiet zone)
+  const totalPx = (modules + margin * 2) * cellSize;
+
+  canvas.width = totalPx;
+  canvas.height = totalPx;
+  const ctx = canvas.getContext('2d');
+
+  // Weisser Hintergrund
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, totalPx, totalPx);
+
+  // Schwarze Module
+  ctx.fillStyle = '#000000';
+  for (let r = 0; r < modules; r++) {
+    for (let c = 0; c < modules; c++) {
+      if (qr.isDark(r, c)) {
+        ctx.fillRect((c + margin) * cellSize, (r + margin) * cellSize, cellSize, cellSize);
+      }
     }
-    if (url) {
-      document.getElementById('downloadLink').href = url;
-      return true;
-    }
-    return false;
-  };
-  // Erst sofort versuchen, dann nach 100/300/700/1500ms
-  if (!setDownloadLink()) {
-    [100, 300, 700, 1500].forEach(ms => setTimeout(setDownloadLink, ms));
+  }
+}
+
+/**
+ * Download: 3 Fallback-Strategien
+ * 1. Native App-Bruecke (In-App WebView): OnyxVault.saveMasterQR()
+ * 2. <a download> Click (normaler Browser)
+ * 3. window.open (Letzter Ausweg)
+ */
+function downloadMasterQR() {
+  const canvas = document.getElementById('masterCanvas');
+  if (!canvas || !canvas.width) {
+    document.getElementById('dlStatus').innerText = '❌ QR noch nicht gerendert';
+    return;
   }
 
-  // Styling für QR anpassen (davidshimjs setzt feste Grössen)
-  setTimeout(() => {
-    const cv = holder.querySelector('canvas');
-    const im = holder.querySelector('img');
-    [cv, im].forEach(el => {
-      if (el) {
-        el.style.maxWidth = '100%';
-        el.style.height = 'auto';
-        el.style.display = 'block';
+  let dataUrl;
+  try {
+    dataUrl = canvas.toDataURL('image/png');
+  } catch (e) {
+    document.getElementById('dlStatus').innerText = '❌ Canvas-Export fehlgeschlagen';
+    return;
+  }
+
+  if (!dataUrl || dataUrl.length < 100) {
+    document.getElementById('dlStatus').innerText = '❌ Canvas leer';
+    return;
+  }
+
+  // Weg 1: Native App-Bruecke (In-App WebView)
+  if (window.OnyxVault && typeof window.OnyxVault.saveMasterQR === 'function') {
+    try {
+      const ok = window.OnyxVault.saveMasterQR(dataUrl, 'ONYX_VAULT_MASTER.png');
+      if (ok) {
+        document.getElementById('dlStatus').innerHTML = '<span style="color:var(--teal)">✅ In Galerie gespeichert</span>';
+        return;
       }
-    });
-    document.getElementById('masterSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 150);
+      document.getElementById('dlStatus').innerText = 'Native speichern fehlgeschlagen - versuche Browser-Download';
+    } catch (e) {
+      console.error('native save threw:', e);
+    }
+  }
+
+  // Weg 2: <a download> Click (normaler Browser)
+  try {
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = 'ONYX_VAULT_MASTER.png';
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => document.body.removeChild(a), 500);
+    document.getElementById('dlStatus').innerHTML = '<span style="color:var(--teal)">✅ Download gestartet (prüfe Downloads-Ordner)</span>';
+    return;
+  } catch (e) {
+    console.error('a.download failed:', e);
+  }
+
+  // Weg 3: window.open als Letzter Ausweg
+  try {
+    window.open(dataUrl, '_blank');
+    document.getElementById('dlStatus').innerText = 'Rechtsklick auf Bild → "Bild speichern unter..."';
+  } catch (e) {
+    document.getElementById('dlStatus').innerText = '❌ Alle Download-Wege fehlgeschlagen: ' + e.message;
+  }
 }
 
 function loadImage(file) {
