@@ -129,34 +129,53 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function processQR(file) {
-  OnyxUI.status('uploadStatus', '🔍 Analysiere QR-Code...');
+  const status = document.getElementById('uploadStatus');
+  const dbg = (msg) => { status.innerHTML = msg; console.log('[KillSwitch]', msg); };
+
   try {
+    dbg('📂 Lese Bild (' + Math.round(file.size/1024) + ' KB)...');
     const img = await loadImage(file);
+    dbg('📐 Bild geladen: ' + img.width + 'x' + img.height + ' - Scanne QR...');
+
     const canvas = document.createElement('canvas');
     canvas.width = img.width;
     canvas.height = img.height;
     const ctx = canvas.getContext('2d');
     ctx.drawImage(img, 0, 0);
-    const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const code = jsQR(data.data, data.width, data.height);
+    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const code = jsQR(imgData.data, imgData.width, imgData.height);
+
     if (!code) {
-      OnyxUI.status('uploadStatus', '❌ Kein QR-Code im Bild gefunden', 'err');
+      status.innerHTML = '<span style="color:var(--red)">❌ Kein QR-Code im Bild gefunden.<br><br>Mögliche Ursachen:<br>• Bild zu dunkel/unscharf<br>• QR zu klein<br>• Nicht der Master-QR sondern anderes Bild<br><br>Versuche: Bild als PNG speichern (nicht JPG mit Kompression) oder Screenshot vom Master-QR machen.</span>';
+      alert('❌ Kein QR-Code im Bild gefunden.
+
+Bild zu dunkel/unscharf oder nicht der Master-QR?');
       return;
     }
-    OnyxUI.status('uploadStatus', '🔑 QR gelesen - prüfe Master-Format...');
-    console.log('[KillSwitch] QR data (first 40 chars):', code.data.substring(0, 40));
+
+    dbg('✓ QR gelesen (' + code.data.length + ' Zeichen) - Format: ' + code.data.substring(0, 20) + '...');
+    await new Promise(r => setTimeout(r, 400));  // kurz lesbar machen
+
+    dbg('🔑 Prüfe Master-Format + entschlüssele (SHA-256 + AES-GCM)...');
     const result = await Hermes.saveIdentity(code.data);
-    console.log('[KillSwitch] saveIdentity result:', result);
+    console.log('[KillSwitch] saveIdentity full result:', result);
+
     if (result.ok) {
-      OnyxUI.status('uploadStatus', '✅ Tresor identifiziert — bereit zur Löschung', 'ok');
-      document.getElementById('displayAppId').innerText = Hermes.getAppId();
-      document.getElementById('killSection').style.display = 'block';
-      window.scrollTo({ top: document.getElementById('killSection').offsetTop - 20, behavior: 'smooth' });
+      status.innerHTML = '<span style="color:var(--teal)">✅ Tresor identifiziert — App-ID: ' + result.appId + '</span>';
+      document.getElementById('displayAppId').innerText = result.appId;
+      const action = document.getElementById('killSection');
+      if (action) {
+        action.style.display = 'block';
+        action.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     } else {
-      OnyxUI.status('uploadStatus', '❌ ' + result.error, 'err');
+      status.innerHTML = '<span style="color:var(--red)">❌ ' + result.error + '<br><br>QR-Format war: <code>' + code.data.substring(0, 30) + '...</code></span>';
+      alert('❌ ' + result.error);
     }
   } catch (e) {
-    OnyxUI.status('uploadStatus', '❌ ' + e.message, 'err');
+    status.innerHTML = '<span style="color:var(--red)">❌ Exception: ' + e.message + '</span>';
+    alert('❌ Fehler: ' + e.message);
+    console.error('[KillSwitch] processQR exception:', e);
   }
 }
 
