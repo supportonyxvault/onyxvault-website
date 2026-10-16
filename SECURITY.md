@@ -1,28 +1,47 @@
-# Security Policy — ONYX VAULT Website
+# Security Policy — ONYX VAULT
 
-ONYX VAULT ist ein **Open-Source Privacy-Messenger**. Wie Signal, Proton und Threema setzen wir auf vollständige Transparenz:
+## 🔍 Transparenz
+
+ONYX VAULT ist ein **Open-Source Privacy-Messenger**. Wie Signal, Proton und Threema setzen wir auf vollständige Code-Transparenz:
 
 > Du musst uns nicht vertrauen — du kannst nachschauen.
 
-## 🔍 Audit-Repository (öffentlich)
+Jede Zeile Code (App, Website, Server-Konfig) liegt öffentlich und ist auditierbar.
 
-Der komplette Code-Snapshot — App, Website, Server — liegt im eigenen Audit-Repository und wird regelmäßig von externen Auditoren und der Community reviewed:
+## 🛠️ Was wo läuft (ehrlich dokumentiert)
 
-**👉 https://github.com/supportonyxvault/onyx-vault-audit**
+### Automatisch bei jedem Code-Push
+- **GitHub CodeQL** — statische Code-Analyse via `security-and-quality` Query-Suite
+- **GitHub Secret Scanning** — findet accidentally committed Keys/Tokens
+- **GitHub Push Protection** — blockt Secrets direkt beim `git push`
+- **Dependabot** — meldet Vulnerabilities in Dependencies
 
-Das Repo enthält (redacted):
-- Android App (Kotlin + Jetpack Compose)
-- Website (HTML, JavaScript, CSS)
-- Oracle Server-Konfiguration (nginx, Node.js, Tor)
-- Vollständiges Threat-Model
-- Scope-Dokument für Security-Audits
+### Scheduled
+- **CodeQL wöchentlich** — Montag 06:00 UTC, falls neue Signaturen hinzugekommen sind
+
+### Externes Review
+- **AI-assisted Code Review** — ein LLM-basierter Audit-Chat hat den Code strukturiert durchgegangen und Findings dokumentiert (die bestätigten Lücken wurden behoben)
+- **Community-Audit** — AGPL-3.0 Lizenz erlaubt jeder/m die Codebasis zu klonen, zu analysieren und Findings zu melden
+- **Audit-Repository**: [github.com/supportonyxvault/onyx-vault-audit](https://github.com/supportonyxvault/onyx-vault-audit) — redacted Snapshot für externe Reviewer
+
+### Was wir NICHT behaupten
+- ❌ Keine Zertifizierung durch GitHub oder andere Dritte
+- ❌ Kein kommerzielles externes Audit durch eine Security-Firma (noch nicht — ggf. später)
+- ❌ Keine formelle Common-Criteria-/CSPN-/BSI-Zertifizierung
+
+Transparenz heißt auch: wir werben nicht mit Dingen die wir nicht haben.
 
 ## 🐛 Responsible Disclosure
 
-Wenn du eine Sicherheitslücke findest, bitte **kein öffentliches GitHub-Issue** — kontaktiere uns direkt via [Impressum](./impressum.html). Wir reagieren innerhalb von 7 Tagen und fixen bestätigte Lücken transparent dokumentiert.
+Wenn du eine Sicherheitslücke findest:
 
-Standard-Disclosure-Zeitraum: 90 Tage.
+1. **Erstelle KEIN öffentliches GitHub-Issue** mit Details zur Lücke
+2. **Kontaktiere uns direkt** — Kontakt-Details auf [Impressum](./impressum.html)
+3. **Nenne:** Datei + Zeile + Reproduktions-Schritte + Impact-Einschätzung
+4. **Gib uns Zeit** zum Fix bevor du veröffentlichst (Standard: 90 Tage)
+
+Wir reagieren innerhalb von 7 Tagen auf jede Meldung und dokumentieren bestätigte Fixes transparent im Audit-Repo.
 
 ## 📜 Lizenz
 
-AGPL-3.0 — jeder darf den Code einsehen, auditieren, forken und weitergeben.
+AGPL-3.0 — © 2026 ONYX VAULT Project
