@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>SaveCard Generator — ONYX VAULT</title>
+<link rel="stylesheet" href="style.css">
+<script src="qrcode.min.js"></script>
+<script src="jsQR.min.js"></script>
+<script src="vendor/jspdf.umd.min.js" integrity="sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk" crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="container">
+  <header>
+    <img src="logo.png" alt="ONYX VAULT" class="logo-img">
+    <div class="logo"><span class="onyx">ONYX</span> <span class="vault">VAULT</span></div>
+    <div class="tagline">SaveCard — Notfall-Karte für Partner / Vertraute</div>
+  </header>
+
+  <nav>
+    <a href="index.html">Übersicht</a>
+    <a href="register.html">Registrierung</a>
+    <a href="recovery.html">Recovery</a>
+    <a href="killswitch.html">Kill Switch</a>
+    <a href="savecard.html" class="active">SaveCard</a>
+  </nav>
+
+  <div class="hero">
+    <h1>🛡️ SaveCard Generator — ONYX VAULT</h1>
+    <p>Erzeuge eine klappbare <strong>Scheckkarte zum Ausdrucken</strong>, die deine Vertrauensperson (Partner, Anwalt, Familie) im Notfall nutzen kann — <strong>ohne App, ohne Tor Browser, ohne technisches Wissen</strong>.</p>
+    <span class="badge">CLIENT-SIDE ONLY</span>
+    <span class="badge">OFFLINE-FÄHIG</span>
+    <span class="badge">NICHTS LANDET BEI UNS</span>
+  </div>
+
+  <div class="card onboarding-card">
+    <h2 class="onboarding-title">❓ Du hast noch keinen Master-QR?</h2>
+    <p>
+      Der <strong>Master-QR</strong> entsteht automatisch bei deiner <strong>Registrierung in der ONYX VAULT App</strong>.
+      Er enthält deinen verschlüsselten Account-Schlüssel und ist die Grundlage für Recovery <em>und</em> Killswitch.
+    </p>
+    <p>
+      👉 <strong>Zuerst registrieren, dann hier wiederkommen:</strong><br>
+      <a href="register.html" class="btn-primary-link">📱 Jetzt in der App registrieren</a>
+    </p>
+    <p class="onboarding-hint">
+      Nach der Registrierung findest du den Master-QR in der App unter<br>
+      <strong>Einstellungen → QR-Codes → Master-QR</strong> (Export als Bild / Foto vom Screen).
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="info">
+      <strong>💡 Warum SaveCard statt den Master-QR direkt weitergeben?</strong>
+      <p>
+        Du <em>könntest</em> deinen Master-QR auch direkt an eine Vertrauensperson schicken.
+        Im Notfall müsste diese Person dann aber:
+      </p>
+      <ol class="info-list">
+        <li>Die passende Website (<code>.onion</code> oder <code>github.io</code>) kennen</li>
+        <li>Den Master-QR dort hochladen</li>
+        <li>Verstehen, welcher Button zu drücken ist</li>
+        <li>Ggf. Tor Browser installieren</li>
+      </ol>
+      <p>
+        <strong>Die SaveCard macht das alles überflüssig:</strong>
+        Deine Vertrauensperson scannt einfach <strong>2 QR-Codes mit dem Handy</strong> — fertig.
+        Keine App, keine Website-Wahl, keine Logik.
+      </p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="info">
+      <strong>🔧 So funktioniert's:</strong>
+      <ol class="info-list">
+        <li>Du lädst deinen <strong>Master-QR</strong> hoch (Foto / Export aus der App)</li>
+        <li>Browser erzeugt <strong>lokal</strong> eine klappbare Karte (PDF) mit 2 QR-Codes</li>
+        <li>Du druckst sie aus und gibst sie deiner Vertrauensperson</li>
+        <li>Im Notfall: Person scannt QR1 mit Handy-Kamera → Trigger-Seite öffnet<br>
+            → QR2 scannen → <strong>Killswitch läuft automatisch über Nostr-Relays</strong></li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>1. Master-QR hochladen</h2>
+    <p>Das Bild bleibt lokal in deinem Browser. <strong>Nichts verlässt diese Seite.</strong></p>
+    <input type="file" id="masterQrFile" accept="image/*" class="file-input">
+    <div id="uploadStatus" class="status-line"></div>
+    <p class="hint">
+      💡 Tipp: Das Foto vom Master-QR kann direkt vom Handy-Screenshot kommen.
+      Je schärfer das Bild, desto zuverlässiger die Dekodierung.
+    </p>
+  </div>
+
+  <div class="card hidden" id="modeCard">
+    <h2>2. Sicherheitsmodus wählen</h2>
+    <label class="radio-row">
+      <input type="radio" name="mode" value="fallback" checked>
+      <strong>Standard (empfohlen):</strong> Token-only Verschlüsselung — funktioniert IMMER, auch wenn Server down ist. QR-Scan + Clearnet-Relay. IP leakt an GitHub (im Notfall akzeptabel).
+    </label>
+    <label class="radio-row disabled">
+      <input type="radio" name="mode" value="secure" disabled>
+      <strong>Max-Secure (Server-Key):</strong> Benötigt Onion-Server mit SERVER_SECRET. <em>Noch nicht aktiviert in V1.</em>
+    </label>
+    <button id="generateBtn" class="btn-primary">🖨️ SaveCard PDF generieren</button>
+  </div>
+
+  <div class="card hidden" id="resultCard">
+    <h2>3. Deine SaveCard</h2>
+    <div id="genStatus" class="status-line"></div>
+    <canvas id="qr1Canvas" class="hidden"></canvas>
+    <canvas id="qr2Canvas" class="hidden"></canvas>
+    <div id="pdfReady" class="hidden">
+      <p class="ready-headline">✅ Karte fertig! Klicke zum Download:</p>
+      <button id="downloadBtn" class="btn-secondary">⬇️ SaveCard.pdf herunterladen</button>
+      <div class="warning-box">
+        <strong>⚠️ WICHTIG:</strong>
+        <ul class="warning-list">
+          <li>Drucke die Karte aus — <strong>nicht digital speichern</strong></li>
+          <li>Lege sie in einen Umschlag mit Anweisung "NUR IM NOTFALL ÖFFNEN"</li>
+          <li>Übergib sie an eine <strong>vertrauenswürdige Person</strong></li>
+          <li>Teste <strong>einmal mit dem Partner</strong>, dass alles verstanden ist</li>
+          <li>Jeder, der die Karte besitzt, kann den Killswitch auslösen</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card more-info-card">
+    <h2>📚 Weitere Infos & Hilfe</h2>
+    <p>Noch Fragen zum Master-QR, zur SaveCard oder zum Killswitch-Konzept?</p>
+    <ul class="info-links">
+      <li><a href="index.html">Übersicht & Konzept</a> — wie das ONYX VAULT System funktioniert</li>
+      <li><a href="register.html">Registrierung</a> — Master-QR entsteht hier</li>
+      <li><a href="recovery.html">Recovery</a> — PIN vergessen? App neu einrichten</li>
+      <li><a href="killswitch.html">Kill Switch</a> — manueller Killswitch mit Master-QR</li>
+    </ul>
+    <p class="meta-hint">
+      Diese Seite ist sowohl via <strong>Tor (.onion)</strong> als auch via <strong>GitHub Pages (Clearnet)</strong> erreichbar.
+      Beide Versionen enthalten identischen Code und können gegenseitig als Fallback dienen.
+    </p>
+  </div>
+
+  <footer>
+    <div class="foot-logo"><span class="onyx">ONYX</span> <span class="vault">VAULT</span></div>
+    <div>
+      <a href="index.html" class="foot-link">Übersicht</a> ·
+      <a href="register.html" class="foot-link">Registrierung</a> ·
+      <a href="recovery.html" class="foot-link">Recovery</a> ·
+      <a href="killswitch.html" class="foot-link">Kill Switch</a> ·
+      <a href="savecard.html" class="foot-link">SaveCard</a> ·
+      <a href="impressum.html" class="foot-link">Impressum</a> ·
+      <a href="datenschutz.html" class="foot-link">Datenschutz</a>
+    </div>
+    <div class="copyright">© 2026 ONYX VAULT V1 · Open Source<br>SaveCard — Partnership-Erweiterung</div>
+  </footer>
+</div>
+
+<script src="savecard.js"></script>
+</body>
+</html>

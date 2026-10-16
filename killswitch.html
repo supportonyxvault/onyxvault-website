@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Kill Switch — ONYX VAULT</title>
+<link rel="stylesheet" href="style.css">
+<script src="jsQR.min.js"></script>
+<script src="nostr.bundle.js"></script>
+<script src="hermes.js"></script>
+</head>
+<body>
+<div class="container">
+  <header>
+    <img src="logo.png" alt="ONYX VAULT" class="logo-img">
+    <div class="logo"><span class="onyx">ONYX</span> <span class="vault">VAULT</span></div>
+    <div class="tagline">Kill Switch — Fernlöschung über Nostr</div>
+  </header>
+
+  <nav>
+    <a href="index.html">Übersicht</a>
+    <a href="register.html">Registrierung</a>
+    <a href="recovery.html">Recovery</a>
+    <a href="killswitch.html" class="active">Kill Switch</a>
+  </nav>
+
+  <div class="hero">
+    <h1>Kill Switch — Fernlöschung über Nostr</h1>
+    <p>Du hast dein Handy verloren, es wurde gestohlen oder beschlagnahmt? Mit dem Kill Switch löst du eine <strong>vollständige, forensische Fernlöschung</strong> aus. Alle ONYX-VAULT-Daten werden unwiderruflich vernichtet, deine Kontakte automatisch benachrichtigt.</p>
+  </div>
+
+  <div class="card">
+    <div class="warn">
+      <strong>⚠️ Voraussetzung:</strong> Du musst zuvor <strong>kostenlos registriert</strong> sein (siehe <a href="register.html" style="color:var(--teal)">Registrierung</a>). Ohne Master-QR kannst du deinen Account nicht per Fernzugriff löschen.
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Wann brauchst du den Kill Switch?</h2>
+    <ul>
+      <li><strong>📱 Handy verloren oder gestohlen</strong> — verhindere Datenzugriff beim Finder/Dieb</li>
+      <li><strong>👮 Beschlagnahmung droht</strong> — lösche bevor Behörden zugreifen können</li>
+      <li><strong>🚪 Spyware erkannt</strong> — die App hat Pegasus/Predator detektiert</li>
+      <li><strong>💥 Notfall-Exit</strong> — du willst digital komplett verschwinden</li>
+      <li><strong>🔥 Journalist in Gefahr</strong> — Quellen schützen bei akuter Bedrohung</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>So funktioniert der Kill Switch</h2>
+    <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Master-QR hochladen</strong><br>Lade deinen bei der Registrierung erhaltenen Master-QR hoch. Entschlüsselung läuft lokal im Browser.</div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Signierter Kill-Befehl übers Nostr-Netzwerk</strong><br>Dein Browser signiert ein Nostr-Event (NIP-01, Kind 30078) und verteilt es an alle öffentlichen Relays. Private Keys werden sofort nach Signatur aus dem RAM gelöscht.</div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Handy empfängt und startet Wipe</strong><br>Sobald das Handy online geht, holt es den Befehl aus einem Nostr-Relay, prüft die Signatur gegen den Hardware-Keystore und startet die Löschung.</div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-text"><strong>Peer-GONE Benachrichtigung</strong><br>Vor dem Löschen sendet die App an alle Kontakte eine signierte "GONE"-Nachricht. Ihre Apps löschen daraufhin den Chat-Verlauf und deine Onion-Adresse.</div></div>
+    <div class="step"><div class="step-num">5</div><div class="step-text"><strong>3-Pass-Overwrite</strong><br>Alle Daten werden dreimal überschrieben (Zufall → Nullen → Muster). Danach forensische Vernichtung von Dateisystem-Fragmenten nach NIST SP 800-88.</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Master-QR hochladen</h2>
+    <div class="upload-zone" id="dropZone" fileInput').click()">
+      <div class="upload-icon">🔲</div>
+      <div><strong>Master-QR für Kill Switch</strong></div>
+      <div style="opacity:0.7;font-size:13px;margin-top:8px">Hier klicken oder PNG/JPG reinziehen</div>
+      <input type="file" id="fileInput" accept="image/png,image/jpeg">
+    </div>
+    <div id="uploadStatus" style="margin-top:14px;text-align:center;font-family:monospace;font-size:13px"></div>
+  </div>
+
+  <div id="killSection" class="card" style="display:none;border:2px solid var(--red)">
+    <h2 style="color:var(--red);border:none">⚠️ Tresor identifiziert — Kill Switch bereit</h2>
+    <p>App-ID: <strong id="displayAppId"></strong></p>
+    <p style="color:var(--red)"><strong>Diese Aktion ist UNUMKEHRBAR!</strong> Alle Daten werden forensisch vernichtet, sobald das Handy online geht.</p>
+    <button class="btn" style="width:100%;margin-top:12px;background:var(--red);color:white;border:none;cursor:pointer;font-family:inherit;padding:14px;font-weight:bold"  id="auto_handler_1">💥 KILL SWITCH JETZT AUSLÖSEN (kostenlos)</button>
+  </div>
+
+  <footer>
+    <div class="foot-logo"><span class="onyx">ONYX</span> <span class="vault">VAULT</span></div>
+    <div>
+      <a href="index.html" class="foot-link">Übersicht</a> ·
+      <a href="register.html" class="foot-link">Registrierung</a> ·
+      <a href="recovery.html" class="foot-link">Recovery</a> ·
+      <a href="killswitch.html" class="foot-link">Kill Switch</a> ·
+      <a href="impressum.html" class="foot-link">Impressum</a> ·
+      <a href="datenschutz.html" class="foot-link">Datenschutz</a>
+    </div>
+    <div class="copyright">
+      © 2026 ONYX VAULT V1 · Open Source<br>
+      Dezentral · Verschlüsselt · Privat
+    </div>
+  </footer>
+</div>
+
+<script src="killswitch.js"></script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Registrierung — ONYX VAULT</title>
+<link rel="stylesheet" href="style.css">
+<script src="jsQR.min.js"></script>
+<script src="qrcode.min.js"></script>
+<script src="hermes.js"></script>
+</head>
+<body>
+<div class="container">
+  <header>
+    <img src="logo.png" alt="ONYX VAULT" class="logo-img">
+    <div class="logo"><span class="onyx">ONYX</span> <span class="vault">VAULT</span></div>
+    <div class="tagline">Registrierung — Master-QR erzeugen</div>
+  </header>
+
+  <nav>
+    <a href="index.html">Übersicht</a>
+    <a href="register.html" class="active">Registrierung</a>
+    <a href="recovery.html">Recovery</a>
+    <a href="killswitch.html">Kill Switch</a>
+  </nav>
+
+  <div class="hero">
+    <h1>App-Registrierungs-QR in Master-QR umwandeln</h1>
+    <p>Lade deinen <strong>App-Registrierungs-QR</strong> hier hoch (den du in der App unter „Mein App-Reg-Code" findest). Die Website entschlüsselt ihn lokal in deinem Browser und erzeugt daraus deinen <strong>finalen Master-QR</strong>.</p>
+    <span class="badge">0 EUR</span>
+    <span class="badge">OHNE EMAIL</span>
+    <span class="badge">ZERO-SERVER</span>
+    <span class="badge">BROWSER-ONLY</span>
+  </div>
+
+  <div class="card">
+    <div class="info">
+      <strong>Ablauf in 4 Schritten:</strong>
+      <ol style="margin:8px 0 0 20px;line-height:1.9">
+        <li>App öffnen → Einstellungen → <em>„Mein App-Reg-Code"</em> → QR speichern/teilen</li>
+        <li>Den gespeicherten QR hier unten reinziehen oder hochladen</li>
+        <li>Master-QR wird im Browser generiert</li>
+        <li>Master-QR herunterladen und <strong>3-fach sichern</strong></li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>1. Registrierungs-QR hochladen</h2>
+    <p>Alle Verarbeitung läuft lokal in deinem Browser. <strong>Nichts verlaesst deinen Browser.</strong></p>
+    <div class="upload-zone" id="dropZone" fileInput').click()">
+      <div class="upload-icon">📱</div>
+      <div><strong>Hier klicken oder Reg-QR reinziehen</strong></div>
+      <div style="opacity:0.7;font-size:13px;margin-top:8px">PNG oder JPG — direkt aus deiner Galerie</div>
+      <input type="file" id="fileInput" accept="image/png,image/jpeg">
+    </div>
+    <div id="uploadStatus" style="margin-top:14px;text-align:center;font-family:monospace;font-size:13px"></div>
+  </div>
+
+  <!-- Master-QR Resultat -->
+  <div class="card" id="masterSection" style="display:none;border:1px solid var(--teal)">
+    <h2 style="color:var(--teal);border:none">✅ MASTER-QR BEREIT</h2>
+    <p><strong>App-ID:</strong> <code id="displayAppId"></code></p>
+    <p style="font-size:13px;opacity:0.85;margin:12px 0">
+      Dies ist dein finaler Master-QR. Lade ihn herunter und sichere ihn an mindestens 3 sicheren Orten.
+      <strong>Der App-Reg-QR allein reicht nicht für Recovery/Kill Switch!</strong>
+    </p>
+    <div style="text-align:center">
+      <canvas id="masterCanvas" style="background:white;padding:14px;border-radius:12px;margin:16px auto;display:block;max-width:95%;height:auto"></canvas>
+      <br>
+      <button class="btn" style="background:var(--teal);color:var(--bg);border:none;cursor:pointer;font-family:inherit"  id="auto_handler_1">
+        📥 MASTER-QR SPEICHERN
+      </button>
+      <div id="dlStatus" style="margin-top:10px;font-family:monospace;font-size:12px"></div>
+    </div>
+    <div class="warn" style="margin-top:16px">
+      <strong>Backup-Strategie — mindestens 3-fach sichern:</strong><br>
+      1️⃣ Verschlüsselter Cloud-Speicher (siehe unten)<br>
+      2️⃣ Papier-Ausdruck im Safe<br>
+      3️⃣ Bei vertrauensvoller Person<br><br>
+      <strong>Ohne diesen Master-QR gibt es keinen Weg zurück, wenn du PIN vergisst und das Handy verlierst.</strong>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Was wird wo gespeichert?</h2>
+    <table>
+      <tr><td>Lokal auf deinem Handy</td><td>Alle Daten (Hardware-Container)</td></tr>
+      <tr><td>Private Master-Keys</td><td>Hardware-Keystore (unauslesbar)</td></tr>
+      <tr><td>Master-QR</td><td>DU — 3-fach gesichert</td></tr>
+      <tr><td>Nostr-Relays (öffentlich)</td><td>Nur signierte Events, kein Klartext</td></tr>
+      <tr><td>Fremde Server</td><td>Keine (gibt es nicht)</td></tr>
+      <tr><td>Google / Apple</td><td>Keine Daten</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Master-QR sichern — Externe Dienste</h2>
+    <p>Nach dem Download kannst du den Master-QR in verschlüsselten Cloud-Diensten speichern:</p>
+    <div class="payment-grid">
+      <a href="https://drive.google.com" target="_blank" rel="noopener" class="payment"><div class="payment-icon">☁️</div>Google Drive<small>drive.google.com</small></a>
+      <a href="https://www.dropbox.com" target="_blank" rel="noopener" class="payment"><div class="payment-icon">📦</div>Dropbox<small>dropbox.com</small></a>
+      <a href="https://www.icloud.com" target="_blank" rel="noopener" class="payment"><div class="payment-icon">📱</div>iCloud<small>icloud.com</small></a>
+      <a href="https://proton.me/mail" target="_blank" rel="noopener" class="payment"><div class="payment-icon">📧</div>Proton Mail<small>proton.me</small></a>
+      <a href="https://signal.org" target="_blank" rel="noopener" class="payment"><div class="payment-icon">💬</div>Signal<small>Chat an dich selbst</small></a>
+      <a href="https://onedrive.live.com" target="_blank" rel="noopener" class="payment"><div class="payment-icon">☁️</div>OneDrive<small>onedrive.com</small></a>
+    </div>
+  </div>
+
+  <footer>
+    <div class="foot-logo"><span class="onyx">ONYX</span> <span class="vault">VAULT</span></div>
+    <div>
+      <a href="index.html" class="foot-link">Übersicht</a> ·
+      <a href="register.html" class="foot-link">Registrierung</a> ·
+      <a href="recovery.html" class="foot-link">Recovery</a> ·
+      <a href="killswitch.html" class="foot-link">Kill Switch</a> ·
+      <a href="impressum.html" class="foot-link">Impressum</a> ·
+      <a href="datenschutz.html" class="foot-link">Datenschutz</a>
+    </div>
+    <div class="copyright">© 2026 ONYX VAULT V1 · Dezentral · Verschlüsselt · Privat</div>
+  </footer>
+</div>
+
+<script src="register.js"></script>
+</body>
+</html>

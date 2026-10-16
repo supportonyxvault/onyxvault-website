@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Tor-Gate · ONYX VAULT</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+  <header>
+    <img src="logo.png" alt="ONYX VAULT" class="logo-img">
+    <div class="logo"><span class="onyx">ONYX</span> <span class="vault">VAULT</span></div>
+    <div class="tagline">Tor-Gate — Umleitung</div>
+  </header>
+
+  <div id="checking" class="card" style="text-align:center">
+    <h2>🧅 Pruefe Tor-Verbindung...</h2>
+    <p>Einen Moment bitte...</p>
+  </div>
+
+  <div id="hasTor" class="card" style="display:none;text-align:center">
+    <h2 style="color:var(--teal)">✅ Tor Browser erkannt!</h2>
+    <p>Du wirst in 2 Sekunden zur anonymen .onion-Seite umgeleitet...</p>
+    <a id="torLink" href="#" style="display:inline-block;padding:14px 24px;background:var(--teal);color:#000;border-radius:8px;font-weight:bold;text-decoration:none;margin-top:12px">JETZT WEITER →</a>
+  </div>
+
+  <div id="noTor" class="card" style="display:none">
+    <h2>⚠️ Du brauchst Tor Browser fuer maximale Anonymitaet</h2>
+    <p>Diese Karte wurde fuer 100% anonymen Zugriff ueber das Tor-Netzwerk erzeugt. Du nutzt gerade einen normalen Browser.</p>
+
+    <div style="margin:20px 0;padding:16px;background:rgba(0,229,255,0.1);border-left:4px solid var(--teal);border-radius:4px">
+      <strong>🔽 EMPFOHLEN — Tor Browser kostenlos installieren:</strong><br><br>
+      <a href="https://www.torproject.org/download/" target="_blank" rel="noopener"
+         style="display:inline-block;padding:14px 24px;background:var(--teal);color:#000;border-radius:8px;font-weight:bold;text-decoration:none">
+        TOR BROWSER HERUNTERLADEN
+      </a>
+      <br><br>
+      <small>Nach Installation: Diese Seite im Tor Browser oeffnen (gleiche URL)</small>
+    </div>
+
+    <div style="margin:20px 0;padding:16px;background:rgba(239,68,68,0.08);border-left:4px solid #ef4444;border-radius:4px">
+      <strong>⚠️ ALTERNATIV — ohne Tor weiterrmachen:</strong><br>
+      <small>Hinweis: Deine IP wird fuer die Website sichtbar (nicht fuer die eigentliche Aktion). Im Notfall OK.</small><br><br>
+      <a id="clearnetLink" href="#"
+         style="display:inline-block;padding:12px 20px;background:#333;color:#fff;border-radius:8px;font-weight:bold;text-decoration:none">
+        Trotzdem Clearnet-Fallback nutzen
+      </a>
+    </div>
+
+    <div style="margin:20px 0;padding:14px;background:rgba(255,255,255,0.05);border-radius:4px;font-size:12px">
+      <strong>Oder manuell:</strong> Kopiere die URL und oeffne sie im Tor Browser:<br>
+      <code id="onionUrlText" style="word-break:break-all;color:var(--teal);font-size:11px"></code><br>
+      <button id="copyBtn" style="margin-top:8px;padding:6px 12px;background:#444;color:#fff;border:0;border-radius:4px;cursor:pointer">📋 URL kopieren</button>
+    </div>
+  </div>
+
+  <footer>
+    <div class="foot-logo"><span class="onyx">ONYX</span> <span class="vault">VAULT</span></div>
+    <div class="copyright">© 2026 ONYX VAULT V2 · Tor-Gate</div>
+  </footer>
+</div>
+
+<script src="tor-gate.js"></script>
+</body>
+</html>

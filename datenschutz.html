@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Datenschutz — ONYX VAULT</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+  <header>
+    <img src="logo.png" alt="ONYX VAULT" class="logo-img">
+    <div class="logo"><span class="onyx">ONYX</span> <span class="vault">VAULT</span></div>
+    <div class="tagline">Datenschutzerklärung — DSGVO-konform</div>
+  </header>
+
+  <nav>
+    <a href="index.html">Übersicht</a>
+    <a href="register.html">Registrierung</a>
+    <a href="recovery.html">Recovery</a>
+    <a href="killswitch.html">Kill Switch</a>
+  </nav>
+
+  <div class="hero">
+    <h1>Datenschutzerklärung</h1>
+    <p>Stand: Oktober 2026 — ONYX VAULT ist auf <strong>minimale Datenerhebung</strong> ausgelegt (Privacy by Design).</p>
+  </div>
+
+  <div class="card">
+    <h2>1. Verantwortlicher (Art. 4 Nr. 7 DSGVO)</h2>
+    <p><strong>ONYX VAULT</strong><br>
+    Postfach<br>
+    33647 Bielefeld<br>
+    Deutschland</p>
+    <p>E-Mail: <a href="mailto:support.onyxvault@gmail.com" style="color:var(--teal)">support.onyxvault@gmail.com</a><br>
+    Website: <a href="https://supportonyxvault.github.io/onyxvault-website/" style="color:var(--teal)">supportonyxvault.github.io/onyxvault-website</a></p>
+  </div>
+
+  <div class="card">
+    <h2>2. Grundsätze der Datenverarbeitung</h2>
+    <div class="info"><strong>ONYX VAULT ist Zero-Server:</strong> Es gibt keine zentrale Datenbank. Alle Daten liegen ausschließlich auf deinem Gerät.</div>
+    <ul>
+      <li>Nachrichten werden ausschließlich im RAM gespeichert und sind nach Ablauf des Timers (60/90/120 Sekunden) unwiderruflich gelöscht.</li>
+      <li>Es werden keine Klardaten gespeichert — alle Nachrichten sind clientseitig verschlüsselt (ChaCha20-Poly1305 + X25519 + Kyber-1024).</li>
+      <li>Es werden keine Metadaten über Kommunikationsbeziehungen gespeichert.</li>
+      <li>Es findet kein Tracking, keine Analyse und kein Profiling statt.</li>
+      <li>Es werden keine Daten an Dritte weitergegeben.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>3. Welche Daten wir verarbeiten</h2>
+
+    <h3>3.1 Lokal auf deinem Gerät</h3>
+    <table style="width:100%;border-collapse:collapse;table-layout:fixed;margin:12px 0;font-size:14px">
+      <thead>
+        <tr style="background:rgba(94,234,212,0.08)">
+          <th style="padding:10px;border-bottom:2px solid #5eead4;width:30%;text-align:left;color:#5eead4;font-weight:bold">Datum</th>
+          <th style="padding:10px;border-bottom:2px solid #5eead4;width:45%;text-align:left;color:#5eead4;font-weight:bold">Zweck</th>
+          <th style="padding:10px;border-bottom:2px solid #5eead4;width:25%;text-align:left;color:#5eead4;font-weight:bold">Speicherdauer</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td style="padding:10px;border-bottom:1px solid rgba(255,255,255,0.08);vertical-align:top;width:30%;color:#fff;text-align:left;font-weight:600">App-ID (pseudonym)</td><td style="padding:10px;border-bottom:1px solid rgba(255,255,255,0.08);vertical-align:top;width:45%;color:#ccc;text-align:left;font-family:inherit;font-size:13px">Identifikation deines Kontos</td><td style="padding:10px;border-bottom:1px solid rgba(255,255,255,0.08);vertical-align:top;width:25%;color:#5eead4;text-align:left;font-family:inherit;font-size:13px">Bis Kill Switch</td></tr>
+        <tr><td style="padding:10px;border-bottom:1px solid rgba(255,255,255,0.08);vertical-align:top;width:30%;color:#fff;text-align:left;font-weight:600">PIN-Hash (Argon2id, Hardware-Keystore)</td><td style="padding:10px;border-bottom:1px solid rgba(255,255,255,0.08);vertical-align:top;width:45%;color:#ccc;text-align:left;font-family:inherit;font-size:13px">Authentifizierung</td><td style="padding:10px;border-bottom:1px solid rgba(255,255,255,0.08);vertical-align:top;width:25%;color:#5eead4;text-align:left;font-family:inherit;font-size:13px">Bis Kill Switch</td></tr>
+        <tr><td style="padding:10px;border-bottom:1px solid rgba(255,255,255,0.08);vertical-align:top;width:30%;color:#fff;text-align:left;font-weight:600">Nostr-Keypair (secp256k1)</td><td style="padding:10px;border-bottom:1px solid rgba(255,255,255,0.08);vertical-align:top;width:45%;color:#ccc;text-align:left;font-family:inherit;font-size:13px">Recovery / Kill-Switch-Signatur</td><td style="padding:10px;border-bottom:1px solid rgba(255,255,255,0.08);vertical-align:top;width:25%;color:#5eead4;text-align:left;font-family:inherit;font-size:13px">Bis Kill Switch</td></tr>
+        <tr><td style="padding:10px;vertical-align:top;width:30%;color:#fff;text-align:left;font-weight:600">SQLCipher-Datenbank</td><td style="padding:10px;vertical-align:top;width:45%;color:#ccc;text-align:left;font-family:inherit;font-size:13px">Chats, Kontakte (verschlüsselt)</td><td style="padding:10px;vertical-align:top;width:25%;color:#5eead4;text-align:left;font-family:inherit;font-size:13px">Bis Kill Switch</td></tr>
+      </tbody>
+    </table>
+    <p>Es wird <strong>kein Name</strong>, keine E-Mail-Adresse, keine Telefonnummer und keine IP-Adresse gespeichert.</p>
+
+    <h3>3.2 Chat-Nachrichten</h3>
+    <p>Nachrichten werden Peer-to-Peer über das Tor-Netzwerk zwischen den Geräten übertragen und <strong>nur im RAM</strong> gehalten. Nach Ablauf des Timers oder beim Schließen der App sind alle Nachrichten unwiderruflich gelöscht. Eine Wiederherstellung ist technisch ausgeschlossen.</p>
+
+    <h3>3.3 Nostr-Relays (Offline-Mailbox, Recovery, Kill Switch)</h3>
+    <p>Für Offline-Nachrichten sowie Recovery- und Kill-Switch-Signale verwendet die App öffentliche Nostr-Relays (u. a. <code>wss://relay.damus.io</code>, <code>wss://nos.lol</code>, <code>wss://nostr.wine</code>). Die übertragenen Events sind signiert (BIP-340 Schnorr) und AES-GCM-verschlüsselt. Die Relays sehen nur verschlüsselte Blobs, keine Klardaten.</p>
+
+    <h3>3.4 Beim Besuch dieser Website</h3>
+    <p>Die Website wird über <strong>GitHub Pages</strong> ausgeliefert. GitHub speichert technische Zugriffsdaten (IP-Adresse, Zeitstempel, User-Agent) in eigenen Server-Logs. Siehe <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener" style="color:var(--teal)">GitHub Privacy Statement</a>.</p>
+    <p>Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an Bereitstellung der Website).</p>
+    <p>Diese Website verwendet <strong>keine externen Schriftarten</strong> (kein Google Fonts), <strong>keine Tracking-Cookies</strong>, <strong>keine Analyse-Tools</strong> und <strong>keine Social-Media-Plugins</strong>. Es werden keine Daten an Dritte übermittelt, außer den unvermeidbaren GitHub-Pages-Zugriffsdaten.</p>
+  </div>
+
+  <div class="card">
+    <h2>4. Hosting</h2>
+    <h3>4.1 Website</h3>
+    <p>Diese Website wird über <strong>GitHub Pages</strong> (GitHub, Inc., 88 Colin P Kelly Jr St, San Francisco, CA 94107, USA) gehostet. Beim Abruf werden Zugriffsdaten (IP, User-Agent) an GitHub übermittelt. GitHub ist EU-US Data Privacy Framework zertifiziert.</p>
+    <p>Datenschutz: <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener" style="color:var(--teal)">GitHub General Privacy Statement</a></p>
+
+    <h3>4.2 Tor-Netzwerk</h3>
+    <p>Die App-Kommunikation erfolgt über das Tor-Netzwerk (The Tor Project, Inc., USA). Durch das Onion-Routing sind IP-Adressen der Nutzer für uns technisch nicht sichtbar.</p>
+
+    <h3>4.3 Nostr-Relays</h3>
+    <p>Für Offline-Mailbox / Recovery / Kill-Switch werden öffentliche Nostr-Relays weltweit verwendet. Die Relay-Betreiber sehen nur signierte, verschlüsselte Events. Es werden keine personenbezogenen Daten übertragen.</p>
+  </div>
+
+  <div class="card">
+    <h2>5. Cookies und Tracking</h2>
+    <div class="info"><strong>ONYX VAULT verwendet keine Tracking-Cookies, keine Analyse-Tools (kein Google Analytics, kein Matomo) und kein Social-Media-Tracking.</strong></div>
+    <p>Die Recovery- und Kill-Switch-Seiten verwenden technisch notwendigen Browser-Speicher (<code>sessionStorage</code>), um deinen Master-QR temporär für den Signiervorgang zu halten. Diese Daten verlassen dein Gerät nicht und werden beim Schließen des Tabs gelöscht.</p>
+    <p>Da keine nicht-notwendigen Cookies eingesetzt werden, ist ein Cookie-Banner nach DSGVO / ePrivacy nicht erforderlich.</p>
+  </div>
+
+  <div class="card">
+    <h2>6. Deine Rechte (Art. 15–22 DSGVO)</h2>
+    <ul>
+      <li><strong>Auskunftsrecht (Art. 15):</strong> Du kannst Auskunft über gespeicherte Daten verlangen — wir speichern technisch gesehen keine.</li>
+      <li><strong>Berichtigung (Art. 16):</strong> Unrichtige Daten können korrigiert werden.</li>
+      <li><strong>Löschung (Art. 17):</strong> Durch Aktivierung des Kill Switch werden alle lokalen Daten sofort und forensisch unwiderruflich gelöscht.</li>
+      <li><strong>Datenübertragbarkeit (Art. 20):</strong> Deine Daten liegen ausschließlich auf deinem Gerät — du hast jederzeit volle Kontrolle.</li>
+      <li><strong>Widerspruch (Art. 21):</strong> Du kannst der Verarbeitung auf Basis berechtigter Interessen widersprechen.</li>
+      <li><strong>Beschwerderecht:</strong> Du hast das Recht, dich bei der zuständigen Aufsichtsbehörde zu beschweren (für NRW: LDI NRW, Kavalleriestr. 2-4, 40213 Düsseldorf).</li>
+    </ul>
+    <p>Zur Ausübung deiner Rechte wende dich an: <a href="mailto:support.onyxvault@gmail.com" style="color:var(--teal)">support.onyxvault@gmail.com</a></p>
+  </div>
+
+  <div class="card">
+    <h2>7. Anonyme Nutzung</h2>
+    <p>ONYX VAULT ist so konzipiert, dass eine vollständige Nutzung ohne Angabe personenbezogener Daten möglich ist. Es wird kein Name, keine E-Mail-Adresse und keine Telefonnummer benötigt. Die Identifikation erfolgt ausschließlich über eine pseudonyme App-ID, die lokal auf dem Gerät generiert wird.</p>
+    <p>Durch die Nutzung des Tor-Netzwerks ist deine IP-Adresse für uns technisch nicht sichtbar. Eine Zuordnung von Kommunikationsinhalten zu einer realen Person ist somit nicht möglich und auch nicht beabsichtigt.</p>
+  </div>
+
+  <div class="card">
+    <h2>8. Änderungen dieser Datenschutzerklärung</h2>
+    <p>Wir behalten uns vor, diese Datenschutzerklärung bei Bedarf anzupassen, um sie stets den aktuellen rechtlichen Anforderungen entsprechend zu halten oder um Änderungen unserer Dienste umzusetzen. Die jeweils aktuelle Version ist unter <a href="https://supportonyxvault.github.io/onyxvault-website/datenschutz.html" style="color:var(--teal)">supportonyxvault.github.io/onyxvault-website/datenschutz.html</a> abrufbar.</p>
+    <p style="opacity:0.6;font-size:12px;margin-top:12px">Stand: Oktober 2026</p>
+  </div>
+
+  <div class="card">
+    <h2>Siehe auch</h2>
+    <p><a href="impressum.html" style="color:var(--teal)">» Impressum</a></p>
+  </div>
+
+  <footer>
+    <div class="foot-logo"><span class="onyx">ONYX</span> <span class="vault">VAULT</span></div>
+    <div>
+      <a href="index.html" class="foot-link">Übersicht</a> ·
+      <a href="register.html" class="foot-link">Registrierung</a> ·
+      <a href="recovery.html" class="foot-link">Recovery</a> ·
+      <a href="killswitch.html" class="foot-link">Kill Switch</a> ·
+      <a href="impressum.html" class="foot-link">Impressum</a> ·
+      <a href="datenschutz.html" class="foot-link">Datenschutz</a>
+    </div>
+    <div class="copyright">
+      © 2026 ONYX VAULT V1 · Open Source<br>
+      Dezentral · Verschlüsselt · Privat
+    </div>
+  </footer>
+</div>
+</body>
+</html>

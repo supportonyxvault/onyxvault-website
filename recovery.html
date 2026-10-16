@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Recovery — ONYX VAULT</title>
+<link rel="stylesheet" href="style.css">
+<script src="jsQR.min.js"></script>
+<script src="nostr.bundle.js"></script>
+<script src="hermes.js"></script>
+</head>
+<body>
+<div class="container">
+  <header>
+    <img src="logo.png" alt="ONYX VAULT" class="logo-img">
+    <div class="logo"><span class="onyx">ONYX</span> <span class="vault">VAULT</span></div>
+    <div class="tagline">Recovery — App-Zugang wiederherstellen</div>
+  </header>
+
+  <nav>
+    <a href="index.html">Übersicht</a>
+    <a href="register.html">Registrierung</a>
+    <a href="recovery.html" class="active">Recovery</a>
+    <a href="killswitch.html">Kill Switch</a>
+  </nav>
+
+  <div class="hero">
+    <h1>App-Zugang wiederherstellen</h1>
+    <p>Passphrase vergessen oder zu viele PIN-Fehlversuche? Dein Master-QR entsperrt den Tresor — <strong>ohne Datenverlust</strong>.</p>
+  </div>
+
+  <div class="card">
+    <div class="warn">
+      <strong>⚠️ Voraussetzung:</strong> Du musst zuvor <strong>kostenlos registriert</strong> sein (siehe <a href="register.html" style="color:var(--teal)">Registrierung</a>). Ohne Master-QR gibt es keinen Weg zurück.
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Master-QR hochladen</h2>
+    <p>Lade deinen Master-QR hoch (den du bei der Registrierung erzeugt hast). Ein signierter Recovery-Befehl wird über die Nostr-Relays an deine App verteilt.</p>
+    <div class="upload-zone" id="dropZone" fileInput').click()">
+      <div class="upload-icon">🔲</div>
+      <div><strong>Master-QR für Recovery</strong></div>
+      <div style="opacity:0.7;font-size:13px;margin-top:8px">Hier klicken oder PNG/JPG reinziehen</div>
+      <input type="file" id="fileInput" accept="image/png,image/jpeg">
+    </div>
+    <div id="uploadStatus" style="margin-top:14px;text-align:center;font-family:monospace;font-size:13px"></div>
+  </div>
+
+  <div id="actionSection" class="card" style="display:none;border:1px solid var(--teal)">
+    <h2 style="color:var(--teal);border:none">✅ Tresor identifiziert</h2>
+    <p>App-ID: <strong id="displayAppId"></strong></p>
+    <p>Status: Bereit zum Senden. Klick auf den Button um Recovery an deine Nostr-Relays zu verteilen.</p>
+    <button class="btn" style="width:100%;margin-top:12px;background:var(--teal);color:var(--bg);border:none;cursor:pointer;font-family:inherit;padding:14px"  id="auto_handler_1">🔓 RECOVERY JETZT SENDEN (kostenlos)</button>
+  </div>
+
+  <div class="card">
+    <h2>So funktioniert Recovery</h2>
+    <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Master-QR hochladen</strong><br>Deine Identität wird lokal im Browser entschlüsselt (AES-GCM mit App-ID als Key). Private Keys bleiben nur im RAM.</div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-text"><strong>Signierter Nostr-Befehl</strong><br>Ein kryptografisch signiertes Event (NIP-01, Kind 30081) wird an alle Nostr-Relays verteilt. Weder Dritte noch die Relays sehen deinen App-Inhalt.</div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Handy empfängt und entsperrt</strong><br>Sobald dein Handy online geht, holt die App den Befehl von einem Nostr-Relay, prüft die Signatur gegen deinen Hardware-Keystore und entsperrt sich. Alte Daten bleiben erhalten.</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Was bleibt — was wird ersetzt?</h2>
+    <table>
+      <tr><td>💬 Chat-Verläufe</td><td>Bleiben alle</td></tr>
+      <tr><td>👥 Kontaktliste</td><td>Bleibt komplett</td></tr>
+      <tr><td>🧅 Deine Onion-Adresse</td><td>Bleibt</td></tr>
+      <tr><td>📱 App-Settings</td><td>Bleiben</td></tr>
+      <tr><td>🔑 Alte Passphrase</td><td>Wird ersetzt</td></tr>
+      <tr><td>⏱️ PIN-Fehler-Counter</td><td>Zurückgesetzt</td></tr>
+    </table>
+  </div>
+
+  <footer>
+    <div class="foot-logo"><span class="onyx">ONYX</span> <span class="vault">VAULT</span></div>
+    <div>
+      <a href="index.html" class="foot-link">Übersicht</a> ·
+      <a href="register.html" class="foot-link">Registrierung</a> ·
+      <a href="recovery.html" class="foot-link">Recovery</a> ·
+      <a href="killswitch.html" class="foot-link">Kill Switch</a> ·
+      <a href="impressum.html" class="foot-link">Impressum</a> ·
+      <a href="datenschutz.html" class="foot-link">Datenschutz</a>
+    </div>
+    <div class="copyright">
+      © 2026 ONYX VAULT V1 · Open Source<br>
+      Dezentral · Verschlüsselt · Privat
+    </div>
+  </footer>
+</div>
+
+<script src="recovery.js"></script>
+</body>
+</html>

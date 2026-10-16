@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Notfall-Trigger — ONYX VAULT</title>
+<link rel="stylesheet" href="style.css">
+<script src="jsQR.min.js"></script>
+<script src="nostr.bundle.js"></script>
+<script src="hermes.js"></script>
+<script src="vendor/pdf.min.js" integrity="sha384-/1qUCSGwTur9vjf/z9lmu/eCUYbpOTgSjmpbMQZ1/CtX2v/WcAIKqRv+U1DUCG6e" crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="container">
+  <header>
+    <img src="logo.png" alt="ONYX VAULT" class="logo-img">
+    <div class="logo"><span class="onyx">ONYX</span> <span class="vault">VAULT</span></div>
+    <div class="tagline tagline-emergency">⚠️ NOTFALL-TRIGGER</div>
+  </header>
+
+  <div class="hero" id="hero">
+    <h1 class="emergency-title">🚨 Killswitch auslösen</h1>
+    <p id="statusMsg">Prüfe Token aus Karte...</p>
+  </div>
+
+  <div class="card hidden" id="scanCard">
+    <h2>📷 Jetzt RÜCKSEITE der Karte scannen</h2>
+    <p>Drehe die SaveCard um und richte deine Kamera auf den <strong>zweiten QR-Code</strong>.</p>
+    <video id="camVideo" autoplay playsinline muted class="cam-video"></video>
+    <div id="scanStatus" class="status-line"></div>
+    <input type="file" id="qrFile" accept="image/*,application/pdf" class="file-input">
+    <p class="hint-sm">Alternativ: SaveCard PDF oder Foto der Rückseite hochladen</p>
+  </div>
+
+  <div class="card hidden" id="actionCard">
+    <h2 class="danger-title">🔴 Killswitch bereit!</h2>
+    <p>Der Master-Key wurde erfolgreich entschlüsselt. Mit einem Klick wird <strong>die App und alle Daten unwiderruflich gelöscht</strong>.</p>
+    <div class="danger-box">
+      <strong class="danger-strong">⚠️ Diese Aktion kann NICHT rückgängig gemacht werden!</strong>
+    </div>
+    <button id="triggerBtn" class="btn-danger-xl">💀 JETZT KILLSWITCH AUSLÖSEN</button>
+    <div id="triggerStatus" class="status-line"></div>
+  </div>
+
+  <div class="card">
+    <h3>Wie das funktioniert</h3>
+    <ul class="plain-list">
+      <li>Diese Seite läuft komplett in deinem Browser</li>
+      <li>Nichts wird gespeichert, keine Daten gehen an uns</li>
+      <li>Der signierte Löschbefehl wird an öffentliche Nostr-Relays geschickt</li>
+      <li>Das Handy der Zielperson empfängt und löscht sich selbst</li>
+      <li>Keine Rückrufmöglichkeit — <strong>nur im echten Notfall nutzen</strong></li>
+    </ul>
+  </div>
+
+  <footer>
+    <div class="foot-logo"><span class="onyx">ONYX</span> <span class="vault">VAULT</span></div>
+    <div class="copyright">© 2026 ONYX VAULT V1 · Notfall-Trigger (SaveCard-Flow)</div>
+  </footer>
+</div>
+
+<script src="savetrigger.js"></script>
+</body>
+</html>
