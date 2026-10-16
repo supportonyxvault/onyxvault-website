@@ -30,7 +30,7 @@
 
   <div class="hero">
     <h1>App-Registrierungs-QR in Master-QR umwandeln</h1>
-    <p>Lade deinen <strong>App-Registrierungs-QR</strong> hier hoch (den du in der App unter „Mein App-Reg-Code" findest). Die Website entschlüsselt ihn lokal in deinem Browser und erzeugt daraus deinen <strong>finalen Master-QR</strong>.</p>
+    <p>Lade deinen <strong>App-Registrierungs-QR</strong> hier hoch (den du in der App unter „Mein App-Reg-Code“ findest). Die Website entschlüsselt ihn lokal in deinem Browser und erzeugt daraus deinen <strong>finalen Master-QR</strong>.</p>
     <span class="badge">0 EUR</span>
     <span class="badge">OHNE EMAIL</span>
     <span class="badge">ZERO-SERVER</span>
@@ -41,7 +41,7 @@
     <div class="info">
       <strong>Ablauf in 4 Schritten:</strong>
       <ol style="margin:8px 0 0 20px;line-height:1.9">
-        <li>App öffnen → Einstellungen → <em>„Mein App-Reg-Code"</em> → QR speichern/teilen</li>
+        <li>App öffnen → Einstellungen → <em>„Mein App-Reg-Code“</em> → QR speichern/teilen</li>
         <li>Den gespeicherten QR hier unten reinziehen oder hochladen</li>
         <li>Master-QR wird im Browser generiert</li>
         <li>Master-QR herunterladen und <strong>3-fach sichern</strong></li>
@@ -52,7 +52,7 @@
   <div class="card">
     <h2>1. Registrierungs-QR hochladen</h2>
     <p>Alle Verarbeitung läuft lokal in deinem Browser. <strong>Nichts verlaesst deinen Browser.</strong></p>
-    <div class="upload-zone" id="dropZone" fileInput').click()">
+    <div class="upload-zone" id="dropZone" tabindex="0" role="button" aria-label="Reg-QR hochladen oder reinziehen">
       <div class="upload-icon">📱</div>
       <div><strong>Hier klicken oder Reg-QR reinziehen</strong></div>
       <div style="opacity:0.7;font-size:13px;margin-top:8px">PNG oder JPG — direkt aus deiner Galerie</div>
@@ -102,13 +102,22 @@
     <h2>Master-QR sichern — Externe Dienste</h2>
     <p>Nach dem Download kannst du den Master-QR in verschlüsselten Cloud-Diensten speichern:</p>
     <div class="payment-grid">
-      <a href="https://drive.google.com" target="_blank" rel="noopener" class="payment"><div class="payment-icon">☁️</div>Google Drive<small>drive.google.com</small></a>
+      <a href="https://drive.google.com" target="_blank" rel="noopener" class="payment"><div class="payment-icon">☁-️</div>Google Drive<small>drive.google.com</small></a>
       <a href="https://www.dropbox.com" target="_blank" rel="noopener" class="payment"><div class="payment-icon">📦</div>Dropbox<small>dropbox.com</small></a>
       <a href="https://www.icloud.com" target="_blank" rel="noopener" class="payment"><div class="payment-icon">📱</div>iCloud<small>icloud.com</small></a>
       <a href="https://proton.me/mail" target="_blank" rel="noopener" class="payment"><div class="payment-icon">📧</div>Proton Mail<small>proton.me</small></a>
       <a href="https://signal.org" target="_blank" rel="noopener" class="payment"><div class="payment-icon">💬</div>Signal<small>Chat an dich selbst</small></a>
-      <a href="https://onedrive.live.com" target="_blank" rel="noopener" class="payment"><div class="payment-icon">☁️</div>OneDrive<small>onedrive.com</small></a>
+      <a href="https://onedrive.live.com" target="_blank" rel="noopener" class="payment"><div class="payment-icon">☁-️</div>OneDrive<small>onedrive.com</small></a>
     </div>
+  </div>
+
+    <div class="card donation-card">
+    <h3 class="donation-title">☕ Unterstützen — nur wenn du magst</h3>
+    <p class="donation-text">
+      ONYX VAULT entwickle ich als <strong>privater Programmierer aus Bielefeld</strong>, komplett aus eigener Tasche — damit es außer „Vertrau uns, wir sind sicher“ noch etwas Anderes gibt, für Menschen denen Privatsphäre und Anonymität noch etwas bedeuten. Kein Investor, kein Tracking, kein Datenverkauf. Jeder Euro geht direkt in Server, Domain und Weiterentwicklung.
+    </p>
+    <a href="https://www.paypal.com/donate?business=jonassimonvolk@gmail.com&no_recurring=0&item_name=ONYX+VAULT+Entwicklung&currency_code=EUR" target="_blank" rel="noopener" class="donation-btn">💙 Hier spenden via PayPal</a>
+    <p class="donation-meta">Jonas Volk · Bielefeld · Open Source</p>
   </div>
 
   <footer>

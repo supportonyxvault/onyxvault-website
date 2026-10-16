@@ -89,7 +89,12 @@
   <div class="card">
     <h2>1. Master-QR hochladen</h2>
     <p>Das Bild bleibt lokal in deinem Browser. <strong>Nichts verlässt diese Seite.</strong></p>
-    <input type="file" id="masterQrFile" accept="image/*" class="file-input">
+    <div class="upload-zone" id="dropZoneMaster" tabindex="0" role="button" aria-label="Master-QR hochladen oder reinziehen">
+      <div class="upload-icon">📱</div>
+      <div><strong>Master-QR hier reinziehen</strong></div>
+      <div style="opacity:0.7;font-size:13px;margin-top:8px">Oder klicken zum Auswaehlen (PNG / JPG)</div>
+      <input type="file" id="masterQrFile" accept="image/*" class="file-input" hidden>
+    </div>
     <div id="uploadStatus" class="status-line"></div>
     <p class="hint">
       💡 Tipp: Das Foto vom Master-QR kann direkt vom Handy-Screenshot kommen.
@@ -144,6 +149,15 @@
       Diese Seite ist sowohl via <strong>Tor (.onion)</strong> als auch via <strong>GitHub Pages (Clearnet)</strong> erreichbar.
       Beide Versionen enthalten identischen Code und können gegenseitig als Fallback dienen.
     </p>
+  </div>
+
+  <div class="card donation-card">
+    <h3 class="donation-title">☕ Unterstützen — nur wenn du magst</h3>
+    <p class="donation-text">
+      ONYX VAULT entwickle ich als <strong>privater Programmierer aus Bielefeld</strong>, komplett aus eigener Tasche — damit es außer „Vertrau uns, wir sind sicher" noch etwas Anderes gibt, für Menschen denen Privatsphäre und Anonymität noch etwas bedeuten. Kein Investor, kein Tracking, kein Datenverkauf. Jeder Euro geht direkt in Server, Domain und Weiterentwicklung.
+    </p>
+    <a href="https://www.paypal.com/donate?business=jonassimonvolk@gmail.com&no_recurring=0&item_name=ONYX+VAULT+Entwicklung&currency_code=EUR" target="_blank" rel="noopener" class="donation-btn">💙 Hier spenden via PayPal</a>
+    <p class="donation-meta">Jonas Volk · Bielefeld · Open Source</p>
   </div>
 
   <footer>

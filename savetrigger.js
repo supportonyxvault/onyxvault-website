@@ -115,8 +115,7 @@ function scanLoop(vid) {
   tick();
 }
 
-document.getElementById('qrFile').addEventListener('change', async (e) => {
-  const file = e.target.files[0];
+async function processTriggerFile(file) {
   if (!file) return;
   const status = document.getElementById('scanStatus');
   status.textContent = '⏳ Lese Datei...';
@@ -133,10 +132,22 @@ document.getElementById('qrFile').addEventListener('change', async (e) => {
         cv.width = vp.width; cv.height = vp.height;
         await page.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise;
         canvasList.push(cv);
-        const cv2 = document.createElement('canvas');
-        cv2.width = Math.floor(vp.width / 2); cv2.height = vp.height;
-        cv2.getContext('2d').drawImage(cv, Math.floor(vp.width / 2), 0, Math.floor(vp.width / 2), vp.height, 0, 0, Math.floor(vp.width / 2), vp.height);
-        canvasList.push(cv2);
+        // Zusaetzliche Crops: linke + rechte Haelfte sowie 4 Quadranten
+        // damit jsQR auch dichte oder randstaendige QRs findet
+        const hw = Math.floor(vp.width / 2);
+        const hh = Math.floor(vp.height / 2);
+        const makeCrop = (sx, sy, sw, sh) => {
+          const c = document.createElement('canvas');
+          c.width = sw; c.height = sh;
+          c.getContext('2d').drawImage(cv, sx, sy, sw, sh, 0, 0, sw, sh);
+          return c;
+        };
+        canvasList.push(makeCrop(0,  0,  hw, vp.height));          // linke Haelfte (voll)
+        canvasList.push(makeCrop(hw, 0,  hw, vp.height));          // rechte Haelfte (voll)
+        canvasList.push(makeCrop(0,  0,  hw, hh));                 // Quadrant oben-links
+        canvasList.push(makeCrop(hw, 0,  hw, hh));                 // Quadrant oben-rechts
+        canvasList.push(makeCrop(0,  hh, hw, hh));                 // Quadrant unten-links
+        canvasList.push(makeCrop(hw, hh, hw, hh));                 // Quadrant unten-rechts
       }
     } else {
       const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = URL.createObjectURL(file); });
@@ -160,7 +171,20 @@ document.getElementById('qrFile').addEventListener('change', async (e) => {
     if (foundQR) { handleQR2(foundQR); }
     else { status.innerHTML = '<span class="err">❌ Kein QR2 (verschluesselter Code) in Datei gefunden.</span>'; }
   } catch (err) { status.innerHTML = '<span class="err">❌ Fehler: ' + err.message + '</span>'; }
-});
+}
+
+// --- Drag & Drop + change wiring für Trigger-Upload ---
+(function(){
+  const zone  = document.getElementById('dropZoneQr');
+  const input = document.getElementById('qrFile');
+  if (!zone || !input) return;
+  zone.addEventListener('click', ev => { if (ev.target !== input) input.click(); });
+  zone.addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') input.click(); });
+  ['dragenter','dragover'].forEach(ev => zone.addEventListener(ev, e => { e.preventDefault(); zone.classList.add('drag-over'); }));
+  ['dragleave','drop' ].forEach(ev => zone.addEventListener(ev, e => { e.preventDefault(); zone.classList.remove('drag-over'); }));
+  zone.addEventListener('drop', e => { const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if (f) processTriggerFile(f); });
+  input.addEventListener('change', e => { const f = e.target.files && e.target.files[0]; if (f) processTriggerFile(f); });
+})();
 
 async function handleQR2(cipher) {
   try {

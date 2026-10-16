@@ -123,3 +123,11 @@ footer .copyright{margin-top:16px;opacity:0.6;font-size:11px;line-height:1.6}
 .wallet-connect-btn{background:linear-gradient(135deg,var(--teal) 0%,var(--teal-bright) 100%);color:var(--bg);border:none;padding:14px 28px;border-radius:8px;cursor:pointer;font-family:monospace;font-weight:bold;font-size:14px;letter-spacing:1px;width:100%;margin-top:16px;transition:0.2s}
 .wallet-connect-btn:hover{transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,229,255,0.4)}
 .wallet-info{background:var(--teal-dim);padding:12px 16px;border-radius:8px;font-size:12px;margin:16px 0;line-height:1.6}
+
+/* ─── Donation Block (dezent, nicht schleimig) ────────────────── */
+.donation-card{border:1px solid var(--teal-dim);background:linear-gradient(135deg,rgba(0,229,255,0.06),rgba(0,229,255,0.02));position:relative}
+.donation-title{color:var(--teal);margin:0 0 10px 0;font-size:17px;border:none}
+.donation-text{font-size:14px;line-height:1.65;opacity:0.9;margin:0 0 14px 0}
+.donation-btn{display:inline-block;background:#0070ba;color:#fff;padding:10px 22px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;transition:0.2s;border:1px solid #0070ba}
+.donation-btn:hover{background:#003087;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,112,186,0.4)}
+.donation-meta{margin:12px 0 0 0;font-size:11px;opacity:0.55;letter-spacing:0.4px}

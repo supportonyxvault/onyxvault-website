@@ -181,5 +181,8 @@ function loadImage(file) {
 }
 
 // ─── Event handlers (ehemals inline onclick/onchange etc.) ─────
-document.getElementById('dropZone').addEventListener('click', function(ev){ document.getElementById( });
-document.getElementById('auto_handler_1').addEventListener('click', function(ev){ downloadMasterQR() });
+document.getElementById('dropZone').addEventListener('click', function(ev){
+  // Klick auf Zone -> File-Input öffnen (aber nicht wenn direkt auf Input geklickt)
+  if (ev.target.id !== 'fileInput') document.getElementById('fileInput').click();
+});
+document.getElementById('auto_handler_1').addEventListener('click', function(ev){ downloadMasterQR(); });

@@ -5,8 +5,7 @@ let masterPayload = null;
 
 function b64(buf) { return btoa(String.fromCharCode(...new Uint8Array(buf))); }
 
-document.getElementById('masterQrFile').addEventListener('change', async (e) => {
-  const file = e.target.files[0];
+async function processMasterFile(file) {
   if (!file) return;
   const status = document.getElementById('uploadStatus');
   status.textContent = '⏳ QR wird dekodiert...';
@@ -29,7 +28,20 @@ document.getElementById('masterQrFile').addEventListener('change', async (e) => 
   } catch (err) {
     status.innerHTML = '<span style="color:#ef4444">❌ ' + err.message + '</span>';
   }
-});
+}
+
+// --- Drag & Drop + change wiring für Master-QR ---
+(function(){
+  const zone  = document.getElementById('dropZoneMaster');
+  const input = document.getElementById('masterQrFile');
+  if (!zone || !input) return;
+  zone.addEventListener('click', ev => { if (ev.target !== input) input.click(); });
+  zone.addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') input.click(); });
+  ['dragenter','dragover'].forEach(ev => zone.addEventListener(ev, e => { e.preventDefault(); zone.classList.add('drag-over'); }));
+  ['dragleave','drop' ].forEach(ev => zone.addEventListener(ev, e => { e.preventDefault(); zone.classList.remove('drag-over'); }));
+  zone.addEventListener('drop', e => { const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if (f) processMasterFile(f); });
+  input.addEventListener('change', e => { const f = e.target.files && e.target.files[0]; if (f) processMasterFile(f); });
+})();
 
 document.getElementById('generateBtn').addEventListener('click', async () => {
   const btn = document.getElementById('generateBtn');

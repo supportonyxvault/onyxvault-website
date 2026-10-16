@@ -29,12 +29,16 @@
     <p>Drehe die SaveCard um und richte deine Kamera auf den <strong>zweiten QR-Code</strong>.</p>
     <video id="camVideo" autoplay playsinline muted class="cam-video"></video>
     <div id="scanStatus" class="status-line"></div>
-    <input type="file" id="qrFile" accept="image/*,application/pdf" class="file-input">
-    <p class="hint-sm">Alternativ: SaveCard PDF oder Foto der Rückseite hochladen</p>
+    <div class="upload-zone" id="dropZoneQr" tabindex="0" role="button" aria-label="SaveCard PDF oder Foto hochladen oder reinziehen">
+      <div class="upload-icon">📄</div>
+      <div><strong>SaveCard-PDF oder Foto hier reinziehen</strong></div>
+      <div style="opacity:0.7;font-size:13px;margin-top:8px">Oder klicken zum Auswaehlen (PDF / PNG / JPG)</div>
+      <input type="file" id="qrFile" accept="image/*,application/pdf" class="file-input" hidden>
+    </div>
   </div>
 
   <div class="card hidden" id="actionCard">
-    <h2 class="danger-title">🔴 Killswitch bereit!</h2>
+    <h2 class="danger-title">🔔 Killswitch bereit!</h2>
     <p>Der Master-Key wurde erfolgreich entschlüsselt. Mit einem Klick wird <strong>die App und alle Daten unwiderruflich gelöscht</strong>.</p>
     <div class="danger-box">
       <strong class="danger-strong">⚠️ Diese Aktion kann NICHT rückgängig gemacht werden!</strong>
@@ -52,6 +56,15 @@
       <li>Das Handy der Zielperson empfängt und löscht sich selbst</li>
       <li>Keine Rückrufmöglichkeit — <strong>nur im echten Notfall nutzen</strong></li>
     </ul>
+  </div>
+
+    <div class="card donation-card">
+    <h3 class="donation-title">☕ Unterstützen — nur wenn du magst</h3>
+    <p class="donation-text">
+      ONYX VAULT entwickle ich als <strong>privater Programmierer aus Bielefeld</strong>, komplett aus eigener Tasche — damit es außer „Vertrau uns, wir sind sicher“ noch etwas Anderes gibt, für Menschen denen Privatsphäre und Anonymität noch etwas bedeuten. Kein Investor, kein Tracking, kein Datenverkauf. Jeder Euro geht direkt in Server, Domain und Weiterentwicklung.
+    </p>
+    <a href="https://www.paypal.com/donate?business=jonassimonvolk@gmail.com&no_recurring=0&item_name=ONYX+VAULT+Entwicklung&currency_code=EUR" target="_blank" rel="noopener" class="donation-btn">💙 Hier spenden via PayPal</a>
+    <p class="donation-meta">Jonas Volk · Bielefeld · Open Source</p>
   </div>
 
   <footer>
